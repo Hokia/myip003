@@ -367,7 +367,7 @@ new Vue({
         // },
         async fetchIPDetails(card, ip) {
             try {
-                const response = await fetch(`http://ip-api.com/json/${ip}/`);
+                const response = await fetch(`https://ipinfo.io/${ip}?token=0613ea41e4a64a`);
                 const data = await response.json();
                 if (data.error) {
                     throw new Error(data.reason);
