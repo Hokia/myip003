@@ -373,8 +373,6 @@ new Vue({
                 if (data.error) {
                     throw new Error(data.reason);
                 }
-        
-                // 更新卡片数据
                 card.ip = ip;
                 card.country_name = data.country_name || '';
                 card.country_code = data.country || '';
@@ -385,22 +383,24 @@ new Vue({
                 card.isp = data.org || '';
                 card.asn = data.asn || '';
 
+                bingMapAPIKEY = this.bingMapAPIKEY;
+
                 // 构造 AS Number 的链接
                 if (card.asn === '') {
                     card.asnlink = false;
                     card.mapUrl = '';
                 } else {
-                    card.asnlink = `https://radar.cloudflare.com/traffic/${card.asn}`;
-                    // 使用 Google Maps Embed API
-                    if (card.latitude && card.longitude) {
-                        card.mapUrl = `https://www.google.com/maps/embed/v1/view?key=${this.bingMapAPIKEY}&center=${card.latitude},${card.longitude}&zoom=10`;
-                    } else {
-                        card.mapUrl = '';
-                    }
+                    //card.asnlink = `https://radar.cloudflare.com/traffic/${card.asn}`;
+                    //card.mapUrl = `https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/${card.latitude},${card.longitude}/5?mapSize=800,640&pp=${card.latitude},${card.longitude};66&key=${bingMapAPIKEY}&fmt=jpeg&dpi=Large`;
+
+                    // 可选改成 Google Maps 内嵌 iFrame
+                    card.mapUrl = `https://www.google.com/maps?q=${card.latitude},${card.longitude}&z=2&output=embed`;
                 }
+
 
             } catch (error) {
                 console.error('获取 IP 详情时出错:', error);
+                // 设置错误信息或保持字段为空
                 card.mapUrl = '';
             }
         },
