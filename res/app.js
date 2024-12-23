@@ -365,6 +365,7 @@ new Vue({
         //     xhr.open('GET', 'https://ipapi.co/json/', true);
         //     xhr.send();
         // },
+
         async fetchIPDetails(card, ip) {
             try {
                 const response = await fetch(`https://ipapi.co/${ip}/json/`);
@@ -372,6 +373,8 @@ new Vue({
                 if (data.error) {
                     throw new Error(data.reason);
                 }
+        
+                // 更新卡片数据
                 card.ip = ip;
                 card.country_name = data.country_name || '';
                 card.country_code = data.country || '';
@@ -382,20 +385,26 @@ new Vue({
                 card.isp = data.org || '';
                 card.asn = data.asn || '';
 
-                bingMapAPIKEY = this.bingMapAPIKEY;
-
                 // 构造 AS Number 的链接
-
-                // 基础嵌入功能是免费的，但有使用限制
-                card.mapUrl = `https://www.google.com/maps/embed/v1/view?key=${bingMapAPIKEY}&center=${latitude},${longitude}&zoom=10`;
-
+                if (card.asn === '') {
+                    card.asnlink = false;
+                    card.mapUrl = '';
+                } else {
+                    card.asnlink = `https://radar.cloudflare.com/traffic/${card.asn}`;
+                    // 使用 Google Maps Embed API
+                    if (card.latitude && card.longitude) {
+                        card.mapUrl = `https://www.google.com/maps/embed/v1/view?key=${this.bingMapAPIKEY}&center=${card.latitude},${card.longitude}&zoom=10`;
+                    } else {
+                        card.mapUrl = '';
+                    }
+                }
 
             } catch (error) {
                 console.error('获取 IP 详情时出错:', error);
-                // 设置错误信息或保持字段为空
                 card.mapUrl = '';
             }
         },
+        
         refreshCard(card) {
             // 清空卡片数据
             this.clearCardData(card);
