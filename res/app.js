@@ -2,7 +2,7 @@ new Vue({
     el: '#app',
     data: {
         // 请在此处填写 Bing Maps API Key，申请是免费的
-        bingMapAPIKEY: 'Ap7Ph8ubijhKv0b9vhpWeRmlxFqEOZXCzeJg1m_jR6aaz6LQCcK4ombxy1Z5bpho',
+        bingMapAPIKEY: 'AIzaSyBp0Qkt1_XLzYZinO_A9fjwTOuKGrFWl6Y',
         ipDataCards: [
             {
                 id: 'upai',
@@ -386,14 +386,8 @@ new Vue({
 
                 // 构造 AS Number 的链接
 
-                if (card.asn === '') {
-                    card.asnlink = false;
-                    card.mapUrl = '';
-                } else {
-                    card.asnlink = `https://radar.cloudflare.com/traffic/${card.asn}`;
-                    // 使用 OpenStreetMap
-                    card.mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${card.longitude-1},${card.latitude-1},${card.longitude+1},${card.latitude+1}&marker=${card.latitude},${card.longitude}&layers=M`;
-                }
+                // 基础嵌入功能是免费的，但有使用限制
+                card.mapUrl = `https://www.google.com/maps/embed/v1/view?key=${bingMapAPIKEY}&center=${latitude},${longitude}&zoom=10`;
 
 
             } catch (error) {
