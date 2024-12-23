@@ -385,15 +385,14 @@ new Vue({
                 bingMapAPIKEY = this.bingMapAPIKEY;
 
                 // 构造 AS Number 的链接
+
                 if (card.asn === '') {
                     card.asnlink = false;
                     card.mapUrl = '';
                 } else {
                     card.asnlink = `https://radar.cloudflare.com/traffic/${card.asn}`;
-                    card.mapUrl = `https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/${card.latitude},${card.longitude}/5?mapSize=800,640&pp=${card.latitude},${card.longitude};66&key=${bingMapAPIKEY}&fmt=jpeg&dpi=Large`;
-
-                    // 可选改成 Google Maps 内嵌 iFrame
-                    // card.mapUrl = `https://www.google.com/maps?q=${card.latitude},${card.longitude}&z=2&output=embed`;
+                    // 使用 OpenStreetMap
+                    card.mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${card.longitude-1},${card.latitude-1},${card.longitude+1},${card.latitude+1}&marker=${card.latitude},${card.longitude}&layers=M`;
                 }
 
 
