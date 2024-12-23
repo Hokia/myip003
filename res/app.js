@@ -1,3 +1,4 @@
+// app.js
 new Vue({
     el: '#app',
     data: {
@@ -13,7 +14,7 @@ new Vue({
                 isp: '',
                 asn: '',
                 asnlink: '',
-                mapUrl: 'res/defaultMap.jpg',
+                mapUrl: '',
                 showMap: false,
                 source: 'Upai'
             },
@@ -28,7 +29,7 @@ new Vue({
                 isp: '',
                 asn: '',
                 asnlink: '',
-                mapUrl: 'res/defaultMap.jpg',
+                mapUrl: '',
                 showMap: false,
                 source: 'Sohu'
             },
@@ -43,7 +44,7 @@ new Vue({
                 isp: '',
                 asn: '',
                 asnlink: '',
-                mapUrl: 'res/defaultMap.jpg',
+                mapUrl: '',
                 showMap: false,
                 source: 'Cloudflare IPv4'
             },
@@ -58,7 +59,7 @@ new Vue({
                 isp: '',
                 asn: '',
                 asnlink: '',
-                mapUrl: 'res/defaultMap.jpg',
+                mapUrl: '',
                 showMap: false,
                 source: 'Cloudflare IPv6'
             },
@@ -73,9 +74,9 @@ new Vue({
                 isp: '',
                 asn: '',
                 asnlink: '',
-                mapUrl: 'res/defaultMap.jpg',
+                mapUrl: '',
                 showMap: false,
-                source: 'IPify IPv4（OpenAI）'
+                source: 'IPify IPv4'
             },
             {
                 id: 'ipify_v6',
@@ -88,10 +89,10 @@ new Vue({
                 isp: '',
                 asn: '',
                 asnlink: '',
-                mapUrl: 'res/defaultMap.jpg',
+                mapUrl: '',
                 showMap: false,
-                source: 'IPify IPv6（OpenAI）'
-            },
+                source: 'IPify IPv6'
+            }
         ],
         connectivityTests: [
             {
@@ -156,49 +157,49 @@ new Vue({
                 id: 'google',
                 name: 'Google',
                 url: 'stun:stun.l.google.com:19302',
-                ip: '待检测或连接错误'
+                ip: '待检测'
             },
             {
                 id: 'nextcloud',
                 name: 'NxtCld',
                 url: 'stun:stun.nextcloud.com:443',
-                ip: '待检测或连接错误'
+                ip: '待检测'
             },
             {
                 id: 'peerjs',
                 name: 'PeerJS',
                 url: 'stun:us-0.turn.peerjs.com',
-                ip: '待检测或连接错误'
+                ip: '待检测'
             },
             {
                 id: 'twilio',
                 name: 'Twilio',
                 url: 'stun:global.stun.twilio.com',
-                ip: '待检测或连接错误'
+                ip: '待检测'
             },
             {
                 id: 'cloudflare',
                 name: 'Cloudflare',
                 url: 'stun:stun.cloudflare.com',
-                ip: '待检测或连接错误'
+                ip: '待检测'
             },
             {
                 id: 'miwifi',
                 name: 'MiWiFi',
                 url: 'stun:stun.miwifi.com',
-                ip: '待检测或连接错误'
+                ip: '待检测'
             },
             {
                 id: 'qq',
                 name: 'QQ',
                 url: 'stun:stun.qq.com',
-                ip: '待检测或连接错误'
+                ip: '待检测'
             },
             {
                 id: 'stunprotocol',
                 name: 'StnPtc',
                 url: 'stun:stunserver.stunprotocol.org',
-                ip: '待检测或连接错误'
+                ip: '待检测'
             }
         ],
         leakTest: [
@@ -225,14 +226,12 @@ new Vue({
                 "name": "检测 4",
                 "geo": "待检测",
                 "ip": "待检测"
-            },
+            }
         ],
         alertMessage: '',
         alertStyle: '',
         alertTitle: '',
         inputIP: '',
-        // queryResult: null,
-        // queryError: '',
         modalQueryResult: null,
         modalQueryError: '',
         isMapShown: false,
@@ -241,7 +240,6 @@ new Vue({
         isCardsCollapsed: false,
     },
     methods: {
-
         getIPFromUpai() {
             const unixTime = Date.now();
             const url = `https://pubstatic.b0.upaiyun.com/?_upnode&t=${unixTime}`;
@@ -267,15 +265,14 @@ new Vue({
         getIPFromSohu() {
             window.ipCallback = (data) => {
                 var ip = data.data.ip;
-                this.ipDataCards[1].ip = ip; // 存储获取到的 IP 地址
+                this.ipDataCards[1].ip = ip;
                 this.ipDataCards[1].source = 'Sohu';
                 this.fetchIPDetails(this.ipDataCards[1], ip);
-                delete window.ipCallback; // 清理
+                delete window.ipCallback;
             };
             var script = document.createElement('script');
             script.src = 'https://v2.sohu.com/api/pc-home-city/home-data/ip2location?callback=ipCallback';
             document.head.appendChild(script);
-            // 清理
             document.head.removeChild(script);
         },
 
@@ -314,6 +311,7 @@ new Vue({
                     this.ipDataCards[3].ip = '获取失败或不存在 IPv6 地址';
                 });
         },
+
         getIPFromIpify_V4() {
             fetch('https://api4.ipify.org?format=json')
                 .then(response => {
@@ -331,6 +329,7 @@ new Vue({
                     this.ipDataCards[4].ip = '获取失败或不存在 IPv4 地址';
                 });
         },
+
         getIPFromIpify_V6() {
             fetch('https://api6.ipify.org?format=json')
                 .then(response => {
@@ -349,7 +348,6 @@ new Vue({
                 });
         },
 
-        // 修改后的 fetchIPDetails 方法
         async fetchIPDetails(card, ip) {
             try {
                 const response = await fetch(`https://ipapi.co/${ip}/json/`);
@@ -367,7 +365,6 @@ new Vue({
                 card.isp = data.org || '';
                 card.asn = data.asn || '';
 
-                // 构造 AS Number 的链接和地图 URL
                 if (card.asn === '') {
                     card.asnlink = false;
                     card.mapUrl = '';
@@ -382,37 +379,26 @@ new Vue({
             }
         },
 
-        // 其他方法保持不变
-        refreshCard(card) {/* 与原代码相同 */},
-        clearCardData(card) {/* 与原代码相同 */},
-        toggleMaps() {/* 与原代码相同 */},
-        checkAllIPs() {/* 与原代码相同 */},
-        checkConnectivityHandler(test) {/* 与原代码相同 */},
-        checkAllConnectivity() {/* 与原代码相同 */},
-        showToast() {/* 与原代码相同 */},
-        
-        // 修改后的提交查询方法
         refreshCard(card) {
-            // 清空卡片数据
             this.clearCardData(card);
             switch (card.source) {
                 case 'Cloudflare IPv4':
-                    this.getIPFromCloudflare_V4(card);
+                    this.getIPFromCloudflare_V4();
                     break;
                 case 'Cloudflare IPv6':
-                    this.getIPFromCloudflare_V6(card);
+                    this.getIPFromCloudflare_V6();
                     break;
                 case 'IPify IPv4':
-                    this.getIPFromIpify_V4(card);
+                    this.getIPFromIpify_V4();
                     break;
                 case 'IPify IPv6':
-                    this.getIPFromIpify_V6(card);
+                    this.getIPFromIpify_V6();
                     break;
                 case 'Upai':
-                    this.getIPFromUpai(card);
+                    this.getIPFromUpai();
                     break;
                 case 'Sohu':
-                    this.getIPFromSohu(card);
+                    this.getIPFromSohu();
                     break;
                 default:
                     console.error('未知来源:', card.source);
@@ -429,7 +415,7 @@ new Vue({
             card.longitude = '';
             card.asn = '';
             card.isp = '';
-            card.mapUrl = 'res/defaultMap.jpg';
+            card.mapUrl = '';
         },
 
         toggleMaps() {
@@ -440,7 +426,6 @@ new Vue({
         },
 
         checkAllIPs() {
-            // 从所有来源获取 IP 地址
             setTimeout(() => {
                 this.getIPFromCloudflare_V4();
                 this.getIPFromCloudflare_V6();
@@ -499,6 +484,7 @@ new Vue({
                 this.checkConnectivityHandler(test);
             });
         },
+
         showToast() {
             this.$nextTick(() => {
                 const toastEl = this.$refs.toast;
@@ -511,44 +497,6 @@ new Vue({
             });
         },
 
-        // 修改后的模态框 IP 查询方法
-        async fetchIPForModal(ip) {
-            try {
-                const response = await fetch(`https://ipapi.co/${ip}/json/`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                if (data.error) {
-                    throw new Error(data.reason);
-                }
-
-                this.modalQueryResult = {
-                    ip,
-                    country_name: data.country_name || '',
-                    country_code: data.country_code || '',
-                    region: data.region || '',
-                    city: data.city || '',
-                    latitude: data.latitude || '',
-                    longitude: data.longitude || '',
-                    isp: data.org || '',
-                    asn: data.asn || '',
-                    asnlink: data.asn ? `https://radar.cloudflare.com/traffic/${data.asn}` : false,
-                    mapUrl: data.latitude && data.longitude ? 
-                        `https://www.openstreetmap.org/export/embed.html?bbox=${data.longitude-1},${data.latitude-1},${data.longitude+1},${data.latitude+1}&marker=${data.latitude},${data.longitude}&layers=M` : ''
-                };
-            } catch (error) {
-                console.error('获取 IP 详情时出错:', error);
-                this.modalQueryError = error.message;
-            }
-        },
-
-        // 其他辅助方法保持不变
-        resetModalData() {
-            this.inputIP = '';
-            this.modalQueryResult = null;
-            this.modalQueryError = '';
-        },
         async checkSTUNServer(stun) {
             try {
                 const servers = { iceServers: [{ urls: stun.url }] };
@@ -570,7 +518,6 @@ new Vue({
                 pc.createDataChannel("");
                 await pc.createOffer().then(offer => pc.setLocalDescription(offer));
 
-                // 设置一个超时计时器
                 await new Promise((resolve, reject) => {
                     setTimeout(() => {
                         if (!candidateReceived) {
@@ -592,22 +539,37 @@ new Vue({
             });
         },
 
-        generate32DigitString() {
-            const unixTime = Date.now().toString(); // 13 位 Unix 时间戳
-            const fixedString = "jason5ng32"; // 固定字符串
-            const randomString = Math.random().toString(36).substring(2, 11); // 随机 9 位字符串
+        async submitQuery() {
+            if (this.isValidIP(this.inputIP)) {
+                this.modalQueryError = '';
+                this.modalQueryResult = null;
+                await this.fetchIPForModal(this.inputIP);
+            } else {
+                this.modalQueryError = '请输入有效的 IPv4 或 IPv6 地址。';
+                this.modalQueryResult = null;
+            }
+        },
 
-            return unixTime + fixedString + randomString; // 拼接字符串
+        isValidIP(ip) {
+            const ipv4Pattern = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+            const ipv6Pattern = /^(([0-9a-fA-F]{1,4}:){7}([0-9a-fA-F]{1,4})|(([0-9a-fA-F]{1,4}:){0,6}([0-9a-fA-F]{1,4})?::([0-9a-fA-F]{1,4}:){0,6}([0-9a-fA-F]{1,4})?))$/;
+            return ipv4Pattern.test(ip) || ipv6Pattern.test(ip);
+        },
+
+        generate32DigitString() {
+            const unixTime = Date.now().toString();
+            const fixedString = "jason5ng32";
+            const randomString = Math.random().toString(36).substring(2, 11);
+            return unixTime + fixedString + randomString;
         },
 
         generate14DigitString() {
-            const fixedString = "jn32"; // 固定字符串
-            const randomString = Math.random().toString(36).substring(2, 11); // 随机 9 位字符串
-
-            return fixedString + randomString; // 拼接字符串
+            const fixedString = "jn32";
+            const randomString = Math.random().toString(36).substring(2, 11);
+            return fixedString + randomString;
         },
 
-        fetchLeakTestIpApiCom(index) {
+        fetchLeakTestIpfetchLeakTestIpApiCom(index) {
             const urlString = this.generate32DigitString();
             const url = `https://${urlString}.edns.ip-api.com/json`;
 
@@ -646,7 +608,6 @@ new Vue({
                     return response.json();
                 })
                 .then(data => {
-                    // 获取 data 对象中的指定键
                     const getKey = Object.keys(data)[key];
                     const keyEntry = data[getKey];
 
@@ -663,7 +624,6 @@ new Vue({
                     this.leakTest[index].ip = '检查出错';
                 });
         },
-
 
         checkAllDNSLeakTest() {
             setTimeout(() => {
@@ -682,10 +642,12 @@ new Vue({
                 this.fetchLeakTestSfSharkCom(3, 0);
             }, 1000);
         },
+
         toggleDarkMode() {
             this.isDarkMode = !this.isDarkMode;
             this.updateBodyClass();
         },
+
         updateBodyClass() {
             if (this.isDarkMode) {
                 document.body.classList.add('dark-mode');
@@ -693,19 +655,58 @@ new Vue({
                 document.body.classList.remove('dark-mode');
             }
         },
+
         checkSystemDarkMode() {
             if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
                 this.isDarkMode = true;
                 this.updateBodyClass();
             }
         },
+
         handleResize() {
-            this.isMobile = window.innerWidth < 768; // 设置断点为 768px
+            this.isMobile = window.innerWidth < 768;
         },
+
         toggleCollapse() {
             this.isCardsCollapsed = !this.isCardsCollapsed;
         },
 
+        async fetchIPForModal(ip) {
+            try {
+                const response = await fetch(`https://ipapi.co/${ip}/json/`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.reason);
+                }
+
+                this.modalQueryResult = {
+                    ip,
+                    country_name: data.country_name || '',
+                    country_code: data.country_code || '',
+                    region: data.region || '',
+                    city: data.city || '',
+                    latitude: data.latitude || '',
+                    longitude: data.longitude || '',
+                    isp: data.org || '',
+                    asn: data.asn || '',
+                    asnlink: data.asn ? `https://radar.cloudflare.com/traffic/${data.asn}` : false,
+                    mapUrl: data.latitude && data.longitude ? 
+                        `https://www.openstreetmap.org/export/embed.html?bbox=${data.longitude-1},${data.latitude-1},${data.longitude+1},${data.latitude+1}&marker=${data.latitude},${data.longitude}&layers=M` : ''
+                };
+            } catch (error) {
+                console.error('获取 IP 详情时出错:', error);
+                this.modalQueryError = error.message;
+            }
+        },
+
+        resetModalData() {
+            this.inputIP = '';
+            this.modalQueryResult = null;
+            this.modalQueryError = '';
+        }
     },
 
     created() {
@@ -713,14 +714,17 @@ new Vue({
         this.isCardsCollapsed = this.isMobile;
         window.addEventListener('resize', this.handleResize);
     },
+
     destroyed() {
         window.removeEventListener('resize', this.handleResize);
     },
+
     watch: {
         isMapShown(newVal) {
             localStorage.setItem('isMapShown', newVal);
         }
     },
+
     mounted() {
         this.checkSystemDarkMode();
         setTimeout(() => {
