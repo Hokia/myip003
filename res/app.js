@@ -370,7 +370,7 @@ new Vue({
         async fetchIPDetails(card, ip) {
             try {
                 
-                const response = await fetch(`https://api.ip.sb/geoip/${ip}`);
+                const response = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,regionName,city,lat,lon,isp,org,as,query`);
                 const data = await response.json();
                 if (data.error) {
                     throw new Error(data.reason);
