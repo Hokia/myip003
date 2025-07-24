@@ -391,7 +391,7 @@ new Vue({
                     card.mapUrl = '';
                 } else {
                     // 可选改成 Google Maps 内嵌 iFrame
-                    card.mapUrl = `https://www.google.com/maps?q=${card.latitude},${card.longitude}&z=2&output=embed`;
+                    card.mapUrl = `https://www.google.com/maps?q=${card.latitude},${card.longitude}&z=10&output=embed`;
                 }
 
 
