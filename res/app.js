@@ -248,7 +248,7 @@ new Vue({
 
         getIPFromUpai() {
             const unixTime = Date.now();
-            const url = `https://pubstatic.b0.upaiyun.com/?_upnode&t=${unixTime}`;
+            const url = https://pubstatic.b0.upaiyun.com/?_upnode&t=${unixTime};
 
             fetch(url)
                 .then(response => {
@@ -369,7 +369,8 @@ new Vue({
         // },
         async fetchIPDetails(card, ip) {
             try {
-                const response = await fetch(`https://ipapi.co/${ip}/json/`);
+                const response = await fetch(https://ipapi.co/${ip}/json/);
+                //const response = await fetch(http://45.207.219.227:3000/api/json/${ip}?fields=status,country,regionName,city,lat,lon,isp,org,as,query);
                 const data = await response.json();
                 if (data.error) {
                     throw new Error(data.reason);
@@ -384,21 +385,28 @@ new Vue({
                 card.isp = data.org || '';
                 card.asn = data.asn || '';
 
+                bingMapAPIKEY = this.bingMapAPIKEY;
+
                 // 构造 AS Number 的链接
                 if (card.asn === '') {
                     card.asnlink = false;
                     card.mapUrl = '';
                 } else {
-                    card.asnlink = `https://radar.cloudflare.com/traffic/${card.asn}`;
-                    // ✅ 使用 Google Maps 嵌入式 URL（无需 API KEY）
-                    card.mapUrl = `https://www.google.com/maps?q=${card.latitude},${card.longitude}&z=10&output=embed`;
+                    //card.asnlink = https://radar.cloudflare.com/traffic/${card.asn};
+                    //card.mapUrl = https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/${card.latitude},${card.longitude}/5?mapSize=800,640&pp=${card.latitude},${card.longitude};66&key=${bingMapAPIKEY}&fmt=jpeg&dpi=Large;
+
+                    // 可选改成 Google Maps 内嵌 iFrame
+                    card.mapUrl = https://www.google.com/maps?q=${card.latitude},${card.longitude}&z=2&output=embed;
+                    card.mapUrl = https://www.google.com/maps/embed/v1/view?key=${bingMapAPIKEY}&center=${latitude},${longitude}&zoom=10;
                 }
+
+
             } catch (error) {
                 console.error('获取 IP 详情时出错:', error);
+                // 设置错误信息或保持字段为空
                 card.mapUrl = '';
             }
         },
-
         refreshCard(card) {
             // 清空卡片数据
             this.clearCardData(card);
@@ -478,7 +486,7 @@ new Vue({
 
             img.onload = () => {
                 clearTimeout(timeout);
-                test.status = `可用 ( ${+ new Date() - beginTime} ms )`;
+                test.status = 可用 ( ${+ new Date() - beginTime} ms );
                 if (test.id === 'google') {
                     this.alertStyle = "text-success";
                     this.alertMessage = "已经连接到国际互联网。";
@@ -498,7 +506,7 @@ new Vue({
                 }
             };
 
-            img.src = `${test.url}${Date.now()}`;
+            img.src = ${test.url}${Date.now()};
         },
 
         checkAllConnectivity() {
@@ -534,9 +542,9 @@ new Vue({
         },
         async fetchIPForModal(ip) {
             try {
-                const response = await fetch(`https://ipapi.co/${ip}/json/`);
+                const response = await fetch(https://ipapi.co/${ip}/json/);
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(HTTP error! status: ${response.status});
                 }
                 const data = await response.json();
                 if (data.error) {
@@ -550,12 +558,12 @@ new Vue({
                     country_code: data.country_code || '',
                     region: data.region || '',
                     city: data.city || '',
-                    card.latitude: data.latitude || '',
-                    card.longitude: data.longitude || '',
+                    latitude: data.latitude || '',
+                    longitude: data.longitude || '',
                     isp: data.org || '',
                     asn: data.asn || '',
-                    asnlink: data.asn ? `https://radar.cloudflare.com/traffic/${data.asn}` : false,
-                    mapUrl: data.latitude && data.longitude ? `https://www.google.com/maps?q=${data.latitude},${data.longitude}&z=2&output=embed` : ''
+                    asnlink: data.asn ? https://radar.cloudflare.com/traffic/${data.asn} : false,
+                    mapUrl: data.latitude && data.longitude ? https://www.google.com/maps?q=${data.latitude},${data.longitude}&z=2&output=embed : ''
                 };
             } catch (error) {
                 console.error('获取 IP 详情时出错:', error);
@@ -627,7 +635,7 @@ new Vue({
 
         fetchLeakTestIpApiCom(index) {
             const urlString = this.generate32DigitString();
-            const url = `https://${urlString}.edns.ip-api.com/json`;
+            const url = https://${urlString}.edns.ip-api.com/json;
 
             fetch(url)
                 .then(response => {
@@ -654,7 +662,7 @@ new Vue({
 
         fetchLeakTestSfSharkCom(index, key) {
             const urlString = this.generate14DigitString();
-            const url = `https://${urlString}.ipv4.surfsharkdns.com`;
+            const url = https://${urlString}.ipv4.surfsharkdns.com;
 
             fetch(url)
                 .then(response => {
