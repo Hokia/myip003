@@ -370,7 +370,6 @@ new Vue({
         async fetchIPDetails(card, ip) {
             try {
                 const response = await fetch(`https://ipapi.co/${ip}/json/`);
-                //const response = await fetch(`http://45.207.219.227:3000/api/json/${ip}?fields=status,country,regionName,city,lat,lon,isp,org,as,query`);
                 const data = await response.json();
                 if (data.error) {
                     throw new Error(data.reason);
@@ -390,17 +389,16 @@ new Vue({
                     card.asnlink = false;
                     card.mapUrl = '';
                 } else {
-                    // 可选改成 Google Maps 内嵌 iFrame
+                    card.asnlink = `https://radar.cloudflare.com/traffic/${card.asn}`;
+                    // ✅ 使用 Google Maps 嵌入式 URL（无需 API KEY）
                     card.mapUrl = `https://www.google.com/maps?q=${card.latitude},${card.longitude}&z=10&output=embed`;
                 }
-
-
             } catch (error) {
                 console.error('获取 IP 详情时出错:', error);
-                // 设置错误信息或保持字段为空
                 card.mapUrl = '';
             }
         },
+
         refreshCard(card) {
             // 清空卡片数据
             this.clearCardData(card);
