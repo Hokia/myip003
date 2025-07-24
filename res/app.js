@@ -396,8 +396,9 @@ new Vue({
                     //card.mapUrl = `https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/${card.latitude},${card.longitude}/5?mapSize=800,640&pp=${card.latitude},${card.longitude};66&key=${bingMapAPIKEY}&fmt=jpeg&dpi=Large`;
 
                     // 可选改成 Google Maps 内嵌 iFrame
-                    card.mapUrl = `https://www.google.com/maps?q=${card.latitude},${card.longitude}&z=2&output=embed`;
-                    card.mapUrl = `https://www.google.com/maps/embed/v1/view?key=${bingMapAPIKEY}&center=${latitude},${longitude}&zoom=10`;
+                    //card.mapUrl = `https://www.google.com/maps?q=${card.latitude},${card.longitude}&z=2&output=embed`;
+                    card.mapUrl = `https://www.google.com/maps?q=${card.latitude},${card.longitude}&z=10&output=embed`;
+                    //card.mapUrl = `https://www.google.com/maps/embed/v1/view?key=${bingMapAPIKEY}&center=${latitude},${longitude}&zoom=10`;
                 }
 
 
