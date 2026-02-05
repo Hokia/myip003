@@ -2,9 +2,9 @@ new Vue({
     el: '#app',
     data: {
         // ✅ Google Maps Embed API（Place 模式免费无限制）
-        // 申请地址：https://console.cloud.google.com/apis/credentials
-        // 启用 API：Maps Embed API
-        googleMapAPIKEY: 'AIzaSyBp0Qkt1_XLzYZinO_A9fjwTOuKGrFWl6Y',
+        // 虽然变量名是 bingMapAPIKEY，但实际使用的是 Google Maps API
+        // 保持这个变量名是为了兼容 HTML 模板
+        bingMapAPIKEY: 'AIzaSyBp0Qkt1_XLzYZinO_A9fjwTOuKGrFWl6Y',
         
         ipDataCards: [
             {
@@ -356,8 +356,8 @@ new Vue({
         // ✅ 生成地图URL的辅助方法 - Google Maps Embed API 版本
         generateMapUrl(latitude, longitude) {
             // Google Maps Embed API（Place模式免费无限制）
-            if (this.googleMapAPIKEY) {
-                return `https://www.google.com/maps/embed/v1/place?key=${this.googleMapAPIKEY}&q=${latitude},${longitude}&zoom=10`;
+            if (this.bingMapAPIKEY) {
+                return `https://www.google.com/maps/embed/v1/place?key=${this.bingMapAPIKEY}&q=${latitude},${longitude}&zoom=10`;
             }
             // 如果没有设置API Key，回退到OpenStreetMap
             const delta = 0.05;
@@ -728,7 +728,7 @@ new Vue({
 
     created() {
         // 如果没有设置 API Key，地图功能不可用
-        if (!this.googleMapAPIKEY || this.googleMapAPIKEY === 'YOUR_GOOGLE_MAPS_API_KEY_HERE') {
+        if (!this.bingMapAPIKEY) {
             this.isMapShown = false;
         } else if (localStorage.getItem('isMapShown')) {
             this.isMapShown = localStorage.getItem('isMapShown') === 'true';
