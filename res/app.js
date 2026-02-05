@@ -376,12 +376,12 @@ new Vue({
             //return `https://staticmap.openstreetmap.de/staticmap.php?center=${latitude},${longitude}&zoom=${zoom}&size=${width}x${height}&markers=${latitude},${longitude},red-pushpin`;
             
             // 方案2: 如果上面的服务不稳定，可以使用 Geoapify（需要注册免费Key）
-              const apiKey = '6d10a764f5e743fd96a46cd609b38dc4';
-              return `https://maps.geoapify.com/v1/staticmap?style=osm-bright&width=${width}&height=${height}&center=lonlat:${longitude},${latitude}&zoom=${zoom}&marker=lonlat:${longitude},${latitude};color:%23ff0000;size:medium&apiKey=${apiKey}`;
+            //  const apiKey = '6d10a764f5e743fd96a46cd609b38dc4';
+            // return `https://maps.geoapify.com/v1/staticmap?style=osm-bright&width=${width}&height=${height}&center=lonlat:${longitude},${latitude}&zoom=${zoom}&marker=lonlat:${longitude},${latitude};color:%23ff0000;size:medium&apiKey=${apiKey}`;
             
             // 方案3: 使用 Google Static Maps API（需要启用该API并配置计费）
-            // if (this.googleMapAPIKEY) {
-            //     return `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=${zoom}&size=${width}x${height}&markers=color:red%7C${latitude},${longitude}&key=${this.googleMapAPIKEY}`;
+              if (this.googleMapAPIKEY) {
+                return `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=${zoom}&size=${width}x${height}&markers=color:red%7C${latitude},${longitude}&key=${this.googleMapAPIKEY}`;
             // }
         },
 
