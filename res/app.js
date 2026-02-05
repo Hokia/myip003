@@ -2,9 +2,9 @@ new Vue({
     el: '#app',
     data: {
         // ✅ Google Maps Embed API（Place 模式免费无限制）
-        // 申请地址：https://console.cloud.google.com/apis/credentials
-        // 启用 API：Maps Embed API
+        // 同时定义两个变量名以兼容 HTML 模板
         bingMapAPIKEY: 'AIzaSyBp0Qkt1_XLzYZinO_A9fjwTOuKGrFWl6Y',
+        googleMapAPIKEY: 'AIzaSyBp0Qkt1_XLzYZinO_A9fjwTOuKGrFWl6Y',
         
         ipDataCards: [
             {
