@@ -1,16 +1,19 @@
 new Vue({
     el: '#app',
     data: {
-        // ✅ Google Maps Embed API（Place 模式免费无限制）
-        // 同时定义两个变量名以兼容 HTML 模板
-        bingMapAPIKEY: 'AIzaSyBp0Qkt1_XLzYZinO_A9fjwTOuKGrFWl6Y',
+        // ✅ Google Maps Static API Key（用于静态地图图片）
+        // 如果不想用Google Maps，可以设为空字符串，将使用OpenStreetMap
         googleMapAPIKEY: 'AIzaSyBp0Qkt1_XLzYZinO_A9fjwTOuKGrFWl6Y',
+        
+        // 兼容旧变量名
+        get bingMapAPIKEY() { return this.googleMapAPIKEY; },
         
         ipDataCards: [
             {
                 id: 'upai',
                 ip: '',
                 country_name: '',
+                country_code: '',
                 region: '',
                 city: '',
                 latitude: '',
@@ -26,6 +29,7 @@ new Vue({
                 id: 'sohu',
                 ip: '',
                 country_name: '',
+                country_code: '',
                 region: '',
                 city: '',
                 latitude: '',
@@ -41,6 +45,7 @@ new Vue({
                 id: 'cloudflare_v4',
                 ip: '',
                 country_name: '',
+                country_code: '',
                 region: '',
                 city: '',
                 latitude: '',
@@ -56,6 +61,7 @@ new Vue({
                 id: 'cloudflare_v6',
                 ip: '',
                 country_name: '',
+                country_code: '',
                 region: '',
                 city: '',
                 latitude: '',
@@ -71,6 +77,7 @@ new Vue({
                 id: 'ipify_v4',
                 ip: '',
                 country_name: '',
+                country_code: '',
                 region: '',
                 city: '',
                 latitude: '',
@@ -86,6 +93,7 @@ new Vue({
                 id: 'ipify_v6',
                 ip: '',
                 country_name: '',
+                country_code: '',
                 region: '',
                 city: '',
                 latitude: '',
@@ -353,23 +361,49 @@ new Vue({
                 });
         },
 
-        // ✅ 生成地图URL的辅助方法 - Google Maps Embed API 版本
+        // ✅ 生成静态地图图片URL
+        // 使用OpenStreetMap的静态地图服务（免费，无需API Key）
         generateMapUrl(latitude, longitude) {
-            // Google Maps Embed API（Place模式免费无限制）
-            if (this.bingMapAPIKEY) {
-                return `https://www.google.com/maps/embed/v1/place?key=${this.bingMapAPIKEY}&q=${latitude},${longitude}&zoom=10`;
+            if (!latitude || !longitude) {
+                return 'res/defaultMap.jpg';
             }
-            // 如果没有设置API Key，回退到OpenStreetMap
-            const delta = 0.05;
-            return `https://www.openstreetmap.org/export/embed.html?bbox=${longitude - delta},${latitude - delta},${longitude + delta},${latitude + delta}&layer=mapnik&marker=${latitude},${longitude}`;
+            
+            // 方案1: 使用 OpenStreetMap 静态地图（免费，推荐）
+            // 使用 staticmap.openstreetmap.de 服务
+            const zoom = 10;
+            const width = 400;
+            const height = 200;
+            return `https://staticmap.openstreetmap.de/staticmap.php?center=${latitude},${longitude}&zoom=${zoom}&size=${width}x${height}&markers=${latitude},${longitude},red-pushpin`;
+            
+            // 方案2: 如果上面的服务不稳定，可以使用 Geoapify（需要注册免费Key）
+            // const apiKey = 'YOUR_GEOAPIFY_KEY';
+            // return `https://maps.geoapify.com/v1/staticmap?style=osm-bright&width=${width}&height=${height}&center=lonlat:${longitude},${latitude}&zoom=${zoom}&marker=lonlat:${longitude},${latitude};color:%23ff0000;size:medium&apiKey=${apiKey}`;
+            
+            // 方案3: 使用 Google Static Maps API（需要启用该API并配置计费）
+            // if (this.googleMapAPIKEY) {
+            //     return `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=${zoom}&size=${width}x${height}&markers=color:red%7C${latitude},${longitude}&key=${this.googleMapAPIKEY}`;
+            // }
         },
 
-        // ✅ 多 API 自动切换机制
+        // ✅ 使用 ip.sb 作为首选API，多API自动切换机制
         async fetchIPDetails(card, ip) {
             const apis = [
                 {
                     name: 'ip.sb',
                     url: `https://api.ip.sb/geoip/${ip}`,
+                    // ip.sb API 返回格式:
+                    // {
+                    //   "ip": "x.x.x.x",
+                    //   "country_code": "CN",
+                    //   "country": "China",
+                    //   "region": "Guangdong",
+                    //   "city": "Shenzhen",
+                    //   "latitude": 22.5455,
+                    //   "longitude": 114.0683,
+                    //   "asn": 4134,          // 注意：是数字
+                    //   "organization": "CHINANET-BACKBONE", // ISP信息在这里
+                    //   "timezone": "Asia/Shanghai"
+                    // }
                     parse: (data) => ({
                         country_name: data.country || '',
                         country_code: data.country_code || '',
@@ -377,8 +411,9 @@ new Vue({
                         city: data.city || '',
                         latitude: data.latitude || '',
                         longitude: data.longitude || '',
-                        isp: data.isp || data.organization || '',
-                        asn: data.asn ? `AS${data.asn}` : ''
+                        isp: data.organization || '',  // ip.sb 的 ISP 信息在 organization 字段
+                        asn: data.asn ? `AS${data.asn}` : '',
+                        asn_number: data.asn || ''  // 保存纯数字用于链接
                     })
                 },
                 {
@@ -394,7 +429,8 @@ new Vue({
                             latitude: data.latitude || '',
                             longitude: data.longitude || '',
                             isp: data.connection?.isp || data.connection?.org || '',
-                            asn: data.connection?.asn ? `AS${data.connection.asn}` : ''
+                            asn: data.connection?.asn ? `AS${data.connection.asn}` : '',
+                            asn_number: data.connection?.asn || ''
                         };
                     }
                 },
@@ -409,7 +445,8 @@ new Vue({
                         latitude: data.latitude || '',
                         longitude: data.longitude || '',
                         isp: '',
-                        asn: ''
+                        asn: '',
+                        asn_number: ''
                     })
                 }
             ];
@@ -434,18 +471,22 @@ new Vue({
                     card.isp = parsed.isp;
                     card.asn = parsed.asn;
 
-                    if (card.asn === '' && card.latitude && card.longitude) {
-                        card.asnlink = false;
-                        card.mapUrl = this.generateMapUrl(card.latitude, card.longitude);
-                    } else if (card.asn) {
-                        card.asnlink = `https://radar.cloudflare.com/traffic/${card.asn}`;
-                        card.mapUrl = this.generateMapUrl(card.latitude, card.longitude);
+                    // 设置ASN链接和地图URL
+                    if (parsed.asn_number) {
+                        // Cloudflare Radar 链接使用纯ASN数字
+                        card.asnlink = `https://radar.cloudflare.com/traffic/AS${parsed.asn_number}`;
                     } else {
                         card.asnlink = false;
-                        card.mapUrl = '';
                     }
                     
-                    console.log(`✅ ${api.name} 获取成功`);
+                    // 生成地图URL
+                    if (card.latitude && card.longitude) {
+                        card.mapUrl = this.generateMapUrl(card.latitude, card.longitude);
+                    } else {
+                        card.mapUrl = 'res/defaultMap.jpg';
+                    }
+                    
+                    console.log(`✅ ${api.name} 获取成功:`, parsed);
                     return; // 成功后退出
                 } catch (error) {
                     console.warn(`${api.name} 失败: ${error.message}，尝试下一个API...`);
@@ -454,7 +495,7 @@ new Vue({
             
             // 所有API都失败
             console.error('所有 IP 地理位置 API 都失败了');
-            card.mapUrl = '';
+            card.mapUrl = 'res/defaultMap.jpg';
         },
 
         refreshCard(card) {
@@ -466,10 +507,10 @@ new Vue({
                 case 'Cloudflare IPv6':
                     this.getIPFromCloudflare_V6(card);
                     break;
-                case 'IPify IPv4':
+                case 'IPify IPv4（OpenAI）':
                     this.getIPFromIpify_V4(card);
                     break;
-                case 'IPify IPv6':
+                case 'IPify IPv6（OpenAI）':
                     this.getIPFromIpify_V6(card);
                     break;
                 case 'Upai':
@@ -592,7 +633,7 @@ new Vue({
             return ipv4Pattern.test(ip) || ipv6Pattern.test(ip);
         },
 
-        // ✅ Modal查询也使用多API自动切换
+        // ✅ Modal查询也使用ip.sb优先的多API自动切换
         async fetchIPForModal(ip) {
             const apis = [
                 {
@@ -605,8 +646,9 @@ new Vue({
                         city: data.city || '',
                         latitude: data.latitude || '',
                         longitude: data.longitude || '',
-                        isp: data.isp || data.organization || '',
-                        asn: data.asn ? `AS${data.asn}` : ''
+                        isp: data.organization || '',
+                        asn: data.asn ? `AS${data.asn}` : '',
+                        asn_number: data.asn || ''
                     })
                 },
                 {
@@ -622,7 +664,8 @@ new Vue({
                             latitude: data.latitude || '',
                             longitude: data.longitude || '',
                             isp: data.connection?.isp || data.connection?.org || '',
-                            asn: data.connection?.asn ? `AS${data.connection.asn}` : ''
+                            asn: data.connection?.asn ? `AS${data.connection.asn}` : '',
+                            asn_number: data.connection?.asn || ''
                         };
                     }
                 },
@@ -637,7 +680,8 @@ new Vue({
                         latitude: data.latitude || '',
                         longitude: data.longitude || '',
                         isp: '',
-                        asn: ''
+                        asn: '',
+                        asn_number: ''
                     })
                 }
             ];
@@ -662,7 +706,7 @@ new Vue({
                         longitude: parsed.longitude,
                         isp: parsed.isp,
                         asn: parsed.asn,
-                        asnlink: parsed.asn ? `https://radar.cloudflare.com/traffic/${parsed.asn}` : false,
+                        asnlink: parsed.asn_number ? `https://radar.cloudflare.com/traffic/AS${parsed.asn_number}` : false,
                         mapUrl: parsed.latitude && parsed.longitude ? this.generateMapUrl(parsed.latitude, parsed.longitude) : ''
                     };
                     
@@ -843,10 +887,8 @@ new Vue({
     },
 
     created() {
-        // 如果没有设置 API Key，地图功能不可用
-        if (!this.bingMapAPIKEY || this.bingMapAPIKEY === 'YOUR_GOOGLE_MAPS_API_KEY_HERE') {
-            this.isMapShown = false;
-        } else if (localStorage.getItem('isMapShown')) {
+        // 地图功能始终可用（使用免费的OpenStreetMap）
+        if (localStorage.getItem('isMapShown')) {
             this.isMapShown = localStorage.getItem('isMapShown') === 'true';
         }
         this.isMobile = window.innerWidth < 768;
