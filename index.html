@@ -83,9 +83,9 @@
 
               <div>
                 <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault"
-                  @change="toggleMaps" :checked="isMapShown" :disabled="!bingMapAPIKEY">
+                  @change="toggleMaps" :checked="isMapShown" :disabled="!googleMapAPIKEY">
 
-                <label class="form-check-label" for="flexSwitchCheckDefault">{{ !bingMapAPIKEY ? '&nbsp;地图不可用' :
+                <label class="form-check-label" for="flexSwitchCheckDefault">{{ !googleMapAPIKEY ? '&nbsp;地图不可用' :
                   '&nbsp;地图' }}</label>
               </div>
 
