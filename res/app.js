@@ -1,12 +1,10 @@
 new Vue({
     el: '#app',
     data: {
-        // ✅ Google Maps Static API Key（用于静态地图图片）
-        // 如果不想用Google Maps，可以设为空字符串，将使用OpenStreetMap
+        // ✅ Google Maps Static API Key
+        // 同时定义两个变量名以兼容 HTML 模板
         googleMapAPIKEY: 'AIzaSyBp0Qkt1_XLzYZinO_A9fjwTOuKGrFWl6Y',
-        
-        // 兼容旧变量名
-        get bingMapAPIKEY() { return this.googleMapAPIKEY; },
+        bingMapAPIKEY: 'AIzaSyBp0Qkt1_XLzYZinO_A9fjwTOuKGrFWl6Y',  // 兼容旧模板
         
         ipDataCards: [
             {
@@ -238,7 +236,7 @@ new Vue({
                 "name": "检测 4",
                 "geo": "待检测",
                 "ip": "待检测"
-            },
+            }
         ],
         alertMessage: '',
         alertStyle: '',
@@ -249,38 +247,40 @@ new Vue({
         isMapShown: false,
         isDarkMode: false,
         isMobile: false,
-        isCardsCollapsed: false,
+        isCardsCollapsed: false
     },
     methods: {
 
-        getIPFromUpai() {
-            const unixTime = Date.now();
-            const url = `https://pubstatic.b0.upaiyun.com/?_upnode&t=${unixTime}`;
+        getIPFromUpai: function() {
+            var self = this;
+            var unixTime = Date.now();
+            var url = 'https://pubstatic.b0.upaiyun.com/?_upnode&t=' + unixTime;
 
             fetch(url)
-                .then(response => {
+                .then(function(response) {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
                     return response.json();
                 })
-                .then(data => {
-                    const ip = data.remote_addr;
-                    this.ipDataCards[0].ip = ip;
-                    this.fetchIPDetails(this.ipDataCards[0], ip);
+                .then(function(data) {
+                    var ip = data.remote_addr;
+                    self.ipDataCards[0].ip = ip;
+                    self.fetchIPDetails(self.ipDataCards[0], ip);
                 })
-                .catch(error => {
+                .catch(function(error) {
                     console.error('Error fetching IP from Upai:', error);
-                    this.ipDataCards[0].ip = '获取失败或不存在 IPv4 地址';
+                    self.ipDataCards[0].ip = '获取失败或不存在 IPv4 地址';
                 });
         },
 
-        getIPFromSohu() {
-            window.ipCallback = (data) => {
+        getIPFromSohu: function() {
+            var self = this;
+            window.ipCallback = function(data) {
                 var ip = data.data.ip;
-                this.ipDataCards[1].ip = ip;
-                this.ipDataCards[1].source = 'Sohu';
-                this.fetchIPDetails(this.ipDataCards[1], ip);
+                self.ipDataCards[1].ip = ip;
+                self.ipDataCards[1].source = 'Sohu';
+                self.fetchIPDetails(self.ipDataCards[1], ip);
                 delete window.ipCallback;
             };
             var script = document.createElement('script');
@@ -289,242 +289,222 @@ new Vue({
             document.head.removeChild(script);
         },
 
-        getIPFromCloudflare_V4() {
+        getIPFromCloudflare_V4: function() {
+            var self = this;
             fetch('https://1.0.0.1/cdn-cgi/trace')
-                .then(response => response.text())
-                .then(data => {
-                    const lines = data.split('\n');
-                    const ipLine = lines.find(line => line.startsWith('ip='));
+                .then(function(response) { return response.text(); })
+                .then(function(data) {
+                    var lines = data.split('\n');
+                    var ipLine = lines.find(function(line) { return line.startsWith('ip='); });
                     if (ipLine) {
-                        const ip = ipLine.split('=')[1];
-                        this.ipDataCards[2].ip = ip;
-                        this.fetchIPDetails(this.ipDataCards[2], ip);
+                        var ip = ipLine.split('=')[1];
+                        self.ipDataCards[2].ip = ip;
+                        self.fetchIPDetails(self.ipDataCards[2], ip);
                     }
                 })
-                .catch(error => {
+                .catch(function(error) {
                     console.error('Error fetching IP from Cloudflare:', error);
-                    this.ipDataCards[2].ip = '获取失败或不存在 IPv4 地址';
+                    self.ipDataCards[2].ip = '获取失败或不存在 IPv4 地址';
                 });
         },
 
-        getIPFromCloudflare_V6() {
+        getIPFromCloudflare_V6: function() {
+            var self = this;
             fetch('https://[2606:4700:4700::1111]/cdn-cgi/trace')
-                .then(response => response.text())
-                .then(data => {
-                    const lines = data.split('\n');
-                    const ipLine = lines.find(line => line.startsWith('ip='));
+                .then(function(response) { return response.text(); })
+                .then(function(data) {
+                    var lines = data.split('\n');
+                    var ipLine = lines.find(function(line) { return line.startsWith('ip='); });
                     if (ipLine) {
-                        const ip = ipLine.split('=')[1];
-                        this.ipDataCards[3].ip = ip;
-                        this.fetchIPDetails(this.ipDataCards[3], ip);
+                        var ip = ipLine.split('=')[1];
+                        self.ipDataCards[3].ip = ip;
+                        self.fetchIPDetails(self.ipDataCards[3], ip);
                     }
                 })
-                .catch(error => {
+                .catch(function(error) {
                     console.error('Error fetching IP from Cloudflare:', error);
-                    this.ipDataCards[3].ip = '获取失败或不存在 IPv6 地址';
+                    self.ipDataCards[3].ip = '获取失败或不存在 IPv6 地址';
                 });
         },
 
-        getIPFromIpify_V4() {
+        getIPFromIpify_V4: function() {
+            var self = this;
             fetch('https://api4.ipify.org?format=json')
-                .then(response => {
+                .then(function(response) {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
                     return response.json();
                 })
-                .then(data => {
-                    this.ipDataCards[4].ip = data.ip;
-                    this.fetchIPDetails(this.ipDataCards[4], data.ip);
+                .then(function(data) {
+                    self.ipDataCards[4].ip = data.ip;
+                    self.fetchIPDetails(self.ipDataCards[4], data.ip);
                 })
-                .catch(error => {
+                .catch(function(error) {
                     console.error('Error fetching IPv4 address from ipify:', error);
-                    this.ipDataCards[4].ip = '获取失败或不存在 IPv4 地址';
+                    self.ipDataCards[4].ip = '获取失败或不存在 IPv4 地址';
                 });
         },
 
-        getIPFromIpify_V6() {
+        getIPFromIpify_V6: function() {
+            var self = this;
             fetch('https://api6.ipify.org?format=json')
-                .then(response => {
+                .then(function(response) {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
                     return response.json();
                 })
-                .then(data => {
-                    this.ipDataCards[5].ip = data.ip;
-                    this.fetchIPDetails(this.ipDataCards[5], data.ip);
+                .then(function(data) {
+                    self.ipDataCards[5].ip = data.ip;
+                    self.fetchIPDetails(self.ipDataCards[5], data.ip);
                 })
-                .catch(error => {
+                .catch(function(error) {
                     console.error('Error fetching IPv6 address from ipify:', error);
-                    this.ipDataCards[5].ip = '获取失败或不存在 IPv6 地址';
+                    self.ipDataCards[5].ip = '获取失败或不存在 IPv6 地址';
                 });
         },
 
-        // ✅ 生成静态地图图片URL
-        // 使用OpenStreetMap的静态地图服务（免费，无需API Key）
-        generateMapUrl(latitude, longitude) {
+        // ✅ 生成 Google Static Maps API URL
+        generateMapUrl: function(latitude, longitude) {
             if (!latitude || !longitude) {
                 return 'res/defaultMap.jpg';
             }
             
-            // 方案1: 使用 OpenStreetMap 静态地图（免费，推荐）
-            // 使用 staticmap.openstreetmap.de 服务
-            //const zoom = 10;
-            //const width = 400;
-            //const height = 200;
-            //return `https://staticmap.openstreetmap.de/staticmap.php?center=${latitude},${longitude}&zoom=${zoom}&size=${width}x${height}&markers=${latitude},${longitude},red-pushpin`;
+            var zoom = 10;
+            var width = 400;
+            var height = 200;
             
-            // 方案2: 如果上面的服务不稳定，可以使用 Geoapify（需要注册免费Key）
-            //  const apiKey = '6d10a764f5e743fd96a46cd609b38dc4';
-            // return `https://maps.geoapify.com/v1/staticmap?style=osm-bright&width=${width}&height=${height}&center=lonlat:${longitude},${latitude}&zoom=${zoom}&marker=lonlat:${longitude},${latitude};color:%23ff0000;size:medium&apiKey=${apiKey}`;
+            // 使用 Google Static Maps API
+            if (this.googleMapAPIKEY) {
+                return 'https://maps.googleapis.com/maps/api/staticmap?center=' + latitude + ',' + longitude + '&zoom=' + zoom + '&size=' + width + 'x' + height + '&markers=color:red%7C' + latitude + ',' + longitude + '&key=' + this.googleMapAPIKEY;
+            }
             
-            // 方案3: 使用 Google Static Maps API（需要启用该API并配置计费）
-              if (this.googleMapAPIKEY) {
-                return `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=${zoom}&size=${width}x${height}&markers=color:red%7C${latitude},${longitude}&key=${this.googleMapAPIKEY}`;
-            // }
+            // 备用：OpenStreetMap 静态地图
+            return 'https://staticmap.openstreetmap.de/staticmap.php?center=' + latitude + ',' + longitude + '&zoom=' + zoom + '&size=' + width + 'x' + height + '&markers=' + latitude + ',' + longitude + ',red-pushpin';
         },
 
-        // ✅ 使用 ip.sb 作为首选API，多API自动切换机制
-        async fetchIPDetails(card, ip) {
-            const apis = [
-                {
-                    name: 'ip.sb',
-                    url: `https://api.ip.sb/geoip/${ip}`,
-                    // ip.sb API 返回格式:
-                    // {
-                    //   "ip": "x.x.x.x",
-                    //   "country_code": "CN",
-                    //   "country": "China",
-                    //   "region": "Guangdong",
-                    //   "city": "Shenzhen",
-                    //   "latitude": 22.5455,
-                    //   "longitude": 114.0683,
-                    //   "asn": 4134,          // 注意：是数字
-                    //   "organization": "CHINANET-BACKBONE", // ISP信息在这里
-                    //   "timezone": "Asia/Shanghai"
-                    // }
-                    parse: (data) => ({
-                        country_name: data.country || '',
-                        country_code: data.country_code || '',
-                        region: data.region || '',
-                        city: data.city || '',
-                        latitude: data.latitude || '',
-                        longitude: data.longitude || '',
-                        isp: data.organization || '',  // ip.sb 的 ISP 信息在 organization 字段
-                        asn: data.asn ? `AS${data.asn}` : '',
-                        asn_number: data.asn || ''  // 保存纯数字用于链接
-                    })
-                },
-                {
-                    name: 'ipwho.is',
-                    url: `https://ipwho.is/${ip}`,
-                    parse: (data) => {
-                        if (!data.success) throw new Error(data.message);
-                        return {
-                            country_name: data.country || '',
-                            country_code: data.country_code || '',
-                            region: data.region || '',
-                            city: data.city || '',
-                            latitude: data.latitude || '',
-                            longitude: data.longitude || '',
-                            isp: data.connection?.isp || data.connection?.org || '',
-                            asn: data.connection?.asn ? `AS${data.connection.asn}` : '',
-                            asn_number: data.connection?.asn || ''
-                        };
-                    }
-                },
-                {
-                    name: 'freeipapi',
-                    url: `https://freeipapi.com/api/json/${ip}`,
-                    parse: (data) => ({
-                        country_name: data.countryName || '',
-                        country_code: data.countryCode || '',
-                        region: data.regionName || '',
-                        city: data.cityName || '',
-                        latitude: data.latitude || '',
-                        longitude: data.longitude || '',
-                        isp: '',
-                        asn: '',
-                        asn_number: ''
-                    })
-                }
-            ];
-
-            for (const api of apis) {
-                try {
-                    const response = await fetch(api.url);
+        // ✅ 使用 ip.sb 作为首选API
+        fetchIPDetails: function(card, ip) {
+            var self = this;
+            
+            // ip.sb API
+            fetch('https://api.ip.sb/geoip/' + ip)
+                .then(function(response) {
                     if (!response.ok) {
-                        console.warn(`${api.name} 返回 ${response.status}，尝试下一个API...`);
-                        continue;
+                        throw new Error('ip.sb returned ' + response.status);
                     }
-                    const data = await response.json();
-                    const parsed = api.parse(data);
-                    
+                    return response.json();
+                })
+                .then(function(data) {
+                    // ip.sb 字段映射
                     card.ip = ip;
-                    card.country_name = parsed.country_name;
-                    card.country_code = parsed.country_code;
-                    card.region = parsed.region;
-                    card.city = parsed.city;
-                    card.latitude = parsed.latitude;
-                    card.longitude = parsed.longitude;
-                    card.isp = parsed.isp;
-                    card.asn = parsed.asn;
+                    card.country_name = data.country || '';
+                    card.country_code = data.country_code || '';
+                    card.region = data.region || '';
+                    card.city = data.city || '';
+                    card.latitude = data.latitude || '';
+                    card.longitude = data.longitude || '';
+                    card.isp = data.organization || '';  // ip.sb 的 ISP 在 organization 字段
+                    card.asn = data.asn ? 'AS' + data.asn : '';
 
-                    // 设置ASN链接和地图URL
-                    if (parsed.asn_number) {
-                        // Cloudflare Radar 链接使用纯ASN数字
-                        card.asnlink = `https://radar.cloudflare.com/traffic/AS${parsed.asn_number}`;
+                    // 设置 ASN 链接
+                    if (data.asn) {
+                        card.asnlink = 'https://radar.cloudflare.com/traffic/AS' + data.asn;
                     } else {
                         card.asnlink = false;
                     }
                     
-                    // 生成地图URL
+                    // 生成地图 URL
                     if (card.latitude && card.longitude) {
-                        card.mapUrl = this.generateMapUrl(card.latitude, card.longitude);
+                        card.mapUrl = self.generateMapUrl(card.latitude, card.longitude);
                     } else {
                         card.mapUrl = 'res/defaultMap.jpg';
                     }
                     
-                    console.log(`✅ ${api.name} 获取成功:`, parsed);
-                    return; // 成功后退出
-                } catch (error) {
-                    console.warn(`${api.name} 失败: ${error.message}，尝试下一个API...`);
-                }
-            }
-            
-            // 所有API都失败
-            console.error('所有 IP 地理位置 API 都失败了');
-            card.mapUrl = 'res/defaultMap.jpg';
+                    console.log('✅ ip.sb 获取成功:', data);
+                })
+                .catch(function(error) {
+                    console.warn('ip.sb 失败: ' + error.message + '，尝试备用API...');
+                    // 备用 API: ipwho.is
+                    self.fetchIPDetailsBackup(card, ip);
+                });
         },
 
-        refreshCard(card) {
+        // 备用 API
+        fetchIPDetailsBackup: function(card, ip) {
+            var self = this;
+            
+            fetch('https://ipwho.is/' + ip)
+                .then(function(response) {
+                    if (!response.ok) {
+                        throw new Error('ipwho.is returned ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(function(data) {
+                    if (!data.success) {
+                        throw new Error(data.message);
+                    }
+                    
+                    card.ip = ip;
+                    card.country_name = data.country || '';
+                    card.country_code = data.country_code || '';
+                    card.region = data.region || '';
+                    card.city = data.city || '';
+                    card.latitude = data.latitude || '';
+                    card.longitude = data.longitude || '';
+                    card.isp = (data.connection && data.connection.isp) || (data.connection && data.connection.org) || '';
+                    card.asn = (data.connection && data.connection.asn) ? 'AS' + data.connection.asn : '';
+
+                    if (data.connection && data.connection.asn) {
+                        card.asnlink = 'https://radar.cloudflare.com/traffic/AS' + data.connection.asn;
+                    } else {
+                        card.asnlink = false;
+                    }
+                    
+                    if (card.latitude && card.longitude) {
+                        card.mapUrl = self.generateMapUrl(card.latitude, card.longitude);
+                    } else {
+                        card.mapUrl = 'res/defaultMap.jpg';
+                    }
+                    
+                    console.log('✅ ipwho.is 获取成功');
+                })
+                .catch(function(error) {
+                    console.error('所有 IP API 都失败了:', error);
+                    card.mapUrl = 'res/defaultMap.jpg';
+                });
+        },
+
+        refreshCard: function(card) {
+            var self = this;
             this.clearCardData(card);
             switch (card.source) {
                 case 'Cloudflare IPv4':
-                    this.getIPFromCloudflare_V4(card);
+                    this.getIPFromCloudflare_V4();
                     break;
                 case 'Cloudflare IPv6':
-                    this.getIPFromCloudflare_V6(card);
+                    this.getIPFromCloudflare_V6();
                     break;
                 case 'IPify IPv4（OpenAI）':
-                    this.getIPFromIpify_V4(card);
+                    this.getIPFromIpify_V4();
                     break;
                 case 'IPify IPv6（OpenAI）':
-                    this.getIPFromIpify_V6(card);
+                    this.getIPFromIpify_V6();
                     break;
                 case 'Upai':
-                    this.getIPFromUpai(card);
+                    this.getIPFromUpai();
                     break;
                 case 'Sohu':
-                    this.getIPFromSohu(card);
+                    this.getIPFromSohu();
                     break;
                 default:
                     console.error('未知来源:', card.source);
             }
         },
 
-        clearCardData(card) {
+        clearCardData: function(card) {
             card.ip = '';
             card.country_name = '';
             card.country_code = '';
@@ -537,78 +517,83 @@ new Vue({
             card.mapUrl = 'res/defaultMap.jpg';
         },
 
-        toggleMaps() {
+        toggleMaps: function() {
             this.isMapShown = !this.isMapShown;
-            this.ipDataCards.forEach(card => {
-                card.showMap = this.isMapShown;
+            var self = this;
+            this.ipDataCards.forEach(function(card) {
+                card.showMap = self.isMapShown;
             });
         },
 
-        checkAllIPs() {
-            setTimeout(() => {
-                this.getIPFromCloudflare_V4();
-                this.getIPFromCloudflare_V6();
+        checkAllIPs: function() {
+            var self = this;
+            setTimeout(function() {
+                self.getIPFromCloudflare_V4();
+                self.getIPFromCloudflare_V6();
             }, 1000);
-            setTimeout(() => {
-                this.getIPFromSohu();
-                this.getIPFromUpai();
+            setTimeout(function() {
+                self.getIPFromSohu();
+                self.getIPFromUpai();
             }, 100);
-            setTimeout(() => {
-                this.getIPFromIpify_V4();
-                this.getIPFromIpify_V6();
+            setTimeout(function() {
+                self.getIPFromIpify_V4();
+                self.getIPFromIpify_V6();
             }, 2000);
         },
 
-        checkConnectivityHandler(test) {
-            const beginTime = + new Date();
+        checkConnectivityHandler: function(test) {
+            var self = this;
+            var beginTime = +new Date();
             test.status = "检查中...";
             var img = new Image();
-            var timeout = setTimeout(() => {
+            var timeout = setTimeout(function() {
                 test.status = "不可用";
                 if (test.id === 'google') {
-                    this.alertStyle = "text-danger";
-                    this.alertMessage = "你当前似乎没有翻墙，部分内容无法显示。";
-                    this.alertTitle = "糟糕！";
-                    this.showToast();
+                    self.alertStyle = "text-danger";
+                    self.alertMessage = "你当前似乎没有翻墙，部分内容无法显示。";
+                    self.alertTitle = "糟糕！";
+                    self.showToast();
                 }
             }, 3 * 1000);
 
-            img.onload = () => {
+            img.onload = function() {
                 clearTimeout(timeout);
-                test.status = `可用 ( ${+ new Date() - beginTime} ms )`;
+                test.status = '可用 ( ' + (+new Date() - beginTime) + ' ms )';
                 if (test.id === 'google') {
-                    this.alertStyle = "text-success";
-                    this.alertMessage = "已经连接到国际互联网。";
-                    this.alertTitle = "提示";
-                    this.showToast();
+                    self.alertStyle = "text-success";
+                    self.alertMessage = "已经连接到国际互联网。";
+                    self.alertTitle = "提示";
+                    self.showToast();
                 }
             };
 
-            img.onerror = () => {
+            img.onerror = function() {
                 clearTimeout(timeout);
                 test.status = "不可用";
                 if (test.id === 'google') {
-                    this.alertStyle = "text-danger";
-                    this.alertMessage = "已经连接到互联网，但部分内容无法显示。";
-                    this.alertTitle = "提示";
-                    this.showToast();
+                    self.alertStyle = "text-danger";
+                    self.alertMessage = "已经连接到互联网，但部分内容无法显示。";
+                    self.alertTitle = "提示";
+                    self.showToast();
                 }
             };
 
-            img.src = `${test.url}${Date.now()}`;
+            img.src = test.url + Date.now();
         },
 
-        checkAllConnectivity() {
-            this.connectivityTests.forEach(test => {
-                this.checkConnectivityHandler(test);
+        checkAllConnectivity: function() {
+            var self = this;
+            this.connectivityTests.forEach(function(test) {
+                self.checkConnectivityHandler(test);
             });
         },
 
-        showToast() {
-            this.$nextTick(() => {
-                const toastEl = this.$refs.toast;
+        showToast: function() {
+            var self = this;
+            this.$nextTick(function() {
+                var toastEl = self.$refs.toast;
                 if (toastEl) {
-                    const toast = new bootstrap.Toast(toastEl);
+                    var toast = new bootstrap.Toast(toastEl);
                     toast.show();
                 } else {
                     console.error("Toast element not found");
@@ -616,30 +601,37 @@ new Vue({
             });
         },
 
-        async submitQuery() {
+        submitQuery: function() {
+            var self = this;
             if (this.isValidIP(this.inputIP)) {
                 this.modalQueryError = '';
                 this.modalQueryResult = null;
-                await this.fetchIPForModal(this.inputIP);
+                this.fetchIPForModal(this.inputIP);
             } else {
                 this.modalQueryError = '请输入有效的 IPv4 或 IPv6 地址。';
                 this.modalQueryResult = null;
             }
         },
 
-        isValidIP(ip) {
-            const ipv4Pattern = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-            const ipv6Pattern = /^(([0-9a-fA-F]{1,4}:){7}([0-9a-fA-F]{1,4})|(([0-9a-fA-F]{1,4}:){0,6}([0-9a-fA-F]{1,4})?::([0-9a-fA-F]{1,4}:){0,6}([0-9a-fA-F]{1,4})?))$/;
+        isValidIP: function(ip) {
+            var ipv4Pattern = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+            var ipv6Pattern = /^(([0-9a-fA-F]{1,4}:){7}([0-9a-fA-F]{1,4})|(([0-9a-fA-F]{1,4}:){0,6}([0-9a-fA-F]{1,4})?::([0-9a-fA-F]{1,4}:){0,6}([0-9a-fA-F]{1,4})?))$/;
             return ipv4Pattern.test(ip) || ipv6Pattern.test(ip);
         },
 
-        // ✅ Modal查询也使用ip.sb优先的多API自动切换
-        async fetchIPForModal(ip) {
-            const apis = [
-                {
-                    name: 'ip.sb',
-                    url: `https://api.ip.sb/geoip/${ip}`,
-                    parse: (data) => ({
+        fetchIPForModal: function(ip) {
+            var self = this;
+            
+            fetch('https://api.ip.sb/geoip/' + ip)
+                .then(function(response) {
+                    if (!response.ok) {
+                        throw new Error('ip.sb returned ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(function(data) {
+                    self.modalQueryResult = {
+                        ip: ip,
                         country_name: data.country || '',
                         country_code: data.country_code || '',
                         region: data.region || '',
@@ -647,97 +639,72 @@ new Vue({
                         latitude: data.latitude || '',
                         longitude: data.longitude || '',
                         isp: data.organization || '',
-                        asn: data.asn ? `AS${data.asn}` : '',
-                        asn_number: data.asn || ''
-                    })
-                },
-                {
-                    name: 'ipwho.is',
-                    url: `https://ipwho.is/${ip}`,
-                    parse: (data) => {
-                        if (!data.success) throw new Error(data.message);
-                        return {
-                            country_name: data.country || '',
-                            country_code: data.country_code || '',
-                            region: data.region || '',
-                            city: data.city || '',
-                            latitude: data.latitude || '',
-                            longitude: data.longitude || '',
-                            isp: data.connection?.isp || data.connection?.org || '',
-                            asn: data.connection?.asn ? `AS${data.connection.asn}` : '',
-                            asn_number: data.connection?.asn || ''
-                        };
-                    }
-                },
-                {
-                    name: 'freeipapi',
-                    url: `https://freeipapi.com/api/json/${ip}`,
-                    parse: (data) => ({
-                        country_name: data.countryName || '',
-                        country_code: data.countryCode || '',
-                        region: data.regionName || '',
-                        city: data.cityName || '',
-                        latitude: data.latitude || '',
-                        longitude: data.longitude || '',
-                        isp: '',
-                        asn: '',
-                        asn_number: ''
-                    })
-                }
-            ];
-
-            for (const api of apis) {
-                try {
-                    const response = await fetch(api.url);
-                    if (!response.ok) {
-                        console.warn(`${api.name} 返回 ${response.status}，尝试下一个API...`);
-                        continue;
-                    }
-                    const data = await response.json();
-                    const parsed = api.parse(data);
-
-                    this.modalQueryResult = {
-                        ip,
-                        country_name: parsed.country_name,
-                        country_code: parsed.country_code,
-                        region: parsed.region,
-                        city: parsed.city,
-                        latitude: parsed.latitude,
-                        longitude: parsed.longitude,
-                        isp: parsed.isp,
-                        asn: parsed.asn,
-                        asnlink: parsed.asn_number ? `https://radar.cloudflare.com/traffic/AS${parsed.asn_number}` : false,
-                        mapUrl: parsed.latitude && parsed.longitude ? this.generateMapUrl(parsed.latitude, parsed.longitude) : ''
+                        asn: data.asn ? 'AS' + data.asn : '',
+                        asnlink: data.asn ? 'https://radar.cloudflare.com/traffic/AS' + data.asn : false,
+                        mapUrl: (data.latitude && data.longitude) ? self.generateMapUrl(data.latitude, data.longitude) : ''
                     };
-                    
-                    console.log(`✅ ${api.name} 获取成功`);
-                    return; // 成功后退出
-                } catch (error) {
-                    console.warn(`${api.name} 失败: ${error.message}，尝试下一个API...`);
-                }
-            }
-            
-            // 所有API都失败
-            this.modalQueryError = '所有 IP 查询服务暂时不可用，请稍后再试';
+                    console.log('✅ Modal查询成功');
+                })
+                .catch(function(error) {
+                    console.warn('ip.sb 失败，尝试备用API...');
+                    self.fetchIPForModalBackup(ip);
+                });
         },
 
-        resetModalData() {
+        fetchIPForModalBackup: function(ip) {
+            var self = this;
+            
+            fetch('https://ipwho.is/' + ip)
+                .then(function(response) {
+                    if (!response.ok) {
+                        throw new Error('ipwho.is returned ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(function(data) {
+                    if (!data.success) {
+                        throw new Error(data.message);
+                    }
+                    
+                    var asn = (data.connection && data.connection.asn) ? data.connection.asn : '';
+                    
+                    self.modalQueryResult = {
+                        ip: ip,
+                        country_name: data.country || '',
+                        country_code: data.country_code || '',
+                        region: data.region || '',
+                        city: data.city || '',
+                        latitude: data.latitude || '',
+                        longitude: data.longitude || '',
+                        isp: (data.connection && data.connection.isp) || (data.connection && data.connection.org) || '',
+                        asn: asn ? 'AS' + asn : '',
+                        asnlink: asn ? 'https://radar.cloudflare.com/traffic/AS' + asn : false,
+                        mapUrl: (data.latitude && data.longitude) ? self.generateMapUrl(data.latitude, data.longitude) : ''
+                    };
+                })
+                .catch(function(error) {
+                    self.modalQueryError = '所有 IP 查询服务暂时不可用，请稍后再试';
+                });
+        },
+
+        resetModalData: function() {
             this.inputIP = '';
             this.modalQueryResult = null;
             this.modalQueryError = '';
         },
 
-        async checkSTUNServer(stun) {
+        checkSTUNServer: function(stun) {
+            var self = this;
             try {
-                const servers = { iceServers: [{ urls: stun.url }] };
-                const pc = new RTCPeerConnection(servers);
-                let candidateReceived = false;
+                var servers = { iceServers: [{ urls: stun.url }] };
+                var pc = new RTCPeerConnection(servers);
+                var candidateReceived = false;
 
-                pc.onicecandidate = event => {
+                pc.onicecandidate = function(event) {
                     if (event.candidate) {
                         candidateReceived = true;
-                        const candidate = event.candidate.candidate;
-                        const ipMatch = /(\b(?:[0-9a-f]{1,4}:){7}[0-9a-f]{1,4}\b)|([0-9]{1,3}(\.[0-9]{1,3}){3})/i.exec(candidate);
+                        var candidate = event.candidate.candidate;
+                        var ipMatch = /(\b(?:[0-9a-f]{1,4}:){7}[0-9a-f]{1,4}\b)|([0-9]{1,3}(\.[0-9]{1,3}){3})/i.exec(candidate);
                         if (ipMatch) {
                             stun.ip = ipMatch[0];
                             pc.close();
@@ -746,122 +713,124 @@ new Vue({
                 };
 
                 pc.createDataChannel("");
-                await pc.createOffer().then(offer => pc.setLocalDescription(offer));
-
-                await new Promise((resolve, reject) => {
-                    setTimeout(() => {
-                        if (!candidateReceived) {
-                            reject(new Error("连接 STUN 服务器超时"));
-                        } else {
-                            resolve();
-                        }
-                    }, 5000);
+                pc.createOffer().then(function(offer) {
+                    return pc.setLocalDescription(offer);
                 });
+
+                setTimeout(function() {
+                    if (!candidateReceived) {
+                        stun.ip = '测试超时或数据出错';
+                    }
+                }, 5000);
             } catch (error) {
                 console.error('STUN Server Test Error:', error);
                 stun.ip = '测试超时或数据出错';
             }
         },
 
-        checkAllWebRTC() {
-            this.stunServers.forEach(stun => {
-                this.checkSTUNServer(stun);
+        checkAllWebRTC: function() {
+            var self = this;
+            this.stunServers.forEach(function(stun) {
+                self.checkSTUNServer(stun);
             });
         },
 
-        generate32DigitString() {
-            const unixTime = Date.now().toString();
-            const fixedString = "jason5ng32";
-            const randomString = Math.random().toString(36).substring(2, 11);
+        generate32DigitString: function() {
+            var unixTime = Date.now().toString();
+            var fixedString = "jason5ng32";
+            var randomString = Math.random().toString(36).substring(2, 11);
             return unixTime + fixedString + randomString;
         },
 
-        generate14DigitString() {
-            const fixedString = "jn32";
-            const randomString = Math.random().toString(36).substring(2, 11);
+        generate14DigitString: function() {
+            var fixedString = "jn32";
+            var randomString = Math.random().toString(36).substring(2, 11);
             return fixedString + randomString;
         },
 
-        fetchLeakTestIpApiCom(index) {
-            const urlString = this.generate32DigitString();
-            const url = `https://${urlString}.edns.ip-api.com/json`;
+        fetchLeakTestIpApiCom: function(index) {
+            var self = this;
+            var urlString = this.generate32DigitString();
+            var url = 'https://' + urlString + '.edns.ip-api.com/json';
 
             fetch(url)
-                .then(response => {
+                .then(function(response) {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
                     return response.json();
                 })
-                .then(data => {
+                .then(function(data) {
                     if (data.dns && 'geo' in data.dns && 'ip' in data.dns) {
-                        const geoSplit = data.dns.geo.split(' - ');
-                        this.leakTest[index].geo = geoSplit[0];
-                        this.leakTest[index].ip = data.dns.ip;
+                        var geoSplit = data.dns.geo.split(' - ');
+                        self.leakTest[index].geo = geoSplit[0];
+                        self.leakTest[index].ip = data.dns.ip;
                     } else {
                         console.error('Unexpected data structure:', data);
                     }
                 })
-                .catch(error => {
+                .catch(function(error) {
                     console.error('Error fetching leak test data:', error);
-                    this.leakTest[index].geo = '检查出错';
-                    this.leakTest[index].ip = '检查出错';
+                    self.leakTest[index].geo = '检查出错';
+                    self.leakTest[index].ip = '检查出错';
                 });
         },
 
-        fetchLeakTestSfSharkCom(index, key) {
-            const urlString = this.generate14DigitString();
-            const url = `https://${urlString}.ipv4.surfsharkdns.com`;
+        fetchLeakTestSfSharkCom: function(index, key) {
+            var self = this;
+            var urlString = this.generate14DigitString();
+            var url = 'https://' + urlString + '.ipv4.surfsharkdns.com';
 
             fetch(url)
-                .then(response => {
+                .then(function(response) {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
                     return response.json();
                 })
-                .then(data => {
-                    const getKey = Object.keys(data)[key];
-                    const keyEntry = data[getKey];
+                .then(function(data) {
+                    var getKey = Object.keys(data)[key];
+                    var keyEntry = data[getKey];
 
                     if (keyEntry && keyEntry.Country && keyEntry.IP) {
-                        this.leakTest[index].geo = keyEntry.Country;
-                        this.leakTest[index].ip = keyEntry.IP;
+                        self.leakTest[index].geo = keyEntry.Country;
+                        self.leakTest[index].ip = keyEntry.IP;
                     } else {
                         console.error('Unexpected data structure:', data);
                     }
                 })
-                .catch(error => {
+                .catch(function(error) {
                     console.error('Error fetching leak test data:', error);
-                    this.leakTest[index].geo = '检查出错';
-                    this.leakTest[index].ip = '检查出错';
+                    self.leakTest[index].geo = '检查出错';
+                    self.leakTest[index].ip = '检查出错';
                 });
         },
 
-        checkAllDNSLeakTest() {
-            setTimeout(() => {
-                this.fetchLeakTestIpApiCom(0);
+        checkAllDNSLeakTest: function() {
+            var self = this;
+            setTimeout(function() {
+                self.fetchLeakTestIpApiCom(0);
             }, 100);
 
-            setTimeout(() => {
-                this.fetchLeakTestIpApiCom(1);
+            setTimeout(function() {
+                self.fetchLeakTestIpApiCom(1);
             }, 1000);
 
-            setTimeout(() => {
-                this.fetchLeakTestSfSharkCom(2, 0);
+            setTimeout(function() {
+                self.fetchLeakTestSfSharkCom(2, 0);
             }, 100);
 
-            setTimeout(() => {
-                this.fetchLeakTestSfSharkCom(3, 0);
+            setTimeout(function() {
+                self.fetchLeakTestSfSharkCom(3, 0);
             }, 1000);
         },
 
-        toggleDarkMode() {
+        toggleDarkMode: function() {
             this.isDarkMode = !this.isDarkMode;
             this.updateBodyClass();
         },
 
-        updateBodyClass() {
+        updateBodyClass: function() {
             if (this.isDarkMode) {
                 document.body.classList.add('dark-mode');
             } else {
@@ -869,25 +838,24 @@ new Vue({
             }
         },
 
-        checkSystemDarkMode() {
+        checkSystemDarkMode: function() {
             if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
                 this.isDarkMode = true;
                 this.updateBodyClass();
             }
         },
 
-        handleResize() {
+        handleResize: function() {
             this.isMobile = window.innerWidth < 768;
         },
 
-        toggleCollapse() {
+        toggleCollapse: function() {
             this.isCardsCollapsed = !this.isCardsCollapsed;
-        },
-
+        }
     },
 
-    created() {
-        // 地图功能始终可用（使用免费的OpenStreetMap）
+    created: function() {
+        // 地图功能始终可用
         if (localStorage.getItem('isMapShown')) {
             this.isMapShown = localStorage.getItem('isMapShown') === 'true';
         }
@@ -896,32 +864,33 @@ new Vue({
         window.addEventListener('resize', this.handleResize);
     },
 
-    destroyed() {
+    destroyed: function() {
         window.removeEventListener('resize', this.handleResize);
     },
 
     watch: {
-        isMapShown(newVal) {
+        isMapShown: function(newVal) {
             localStorage.setItem('isMapShown', newVal);
         }
     },
 
-    mounted() {
+    mounted: function() {
+        var self = this;
         this.checkSystemDarkMode();
-        setTimeout(() => {
-            this.checkAllConnectivity();
+        setTimeout(function() {
+            self.checkAllConnectivity();
         }, 2500);
-        setTimeout(() => {
-            this.checkAllWebRTC();
+        setTimeout(function() {
+            self.checkAllWebRTC();
         }, 4000);
-        setTimeout(() => {
-            this.checkAllDNSLeakTest();
+        setTimeout(function() {
+            self.checkAllDNSLeakTest();
         }, 2500);
         this.checkAllIPs();
-        setTimeout(() => {
-            this.checkAllConnectivity();
+        setTimeout(function() {
+            self.checkAllConnectivity();
         }, 6000);
-        const modalElement = document.getElementById('IPCheck');
+        var modalElement = document.getElementById('IPCheck');
         modalElement.addEventListener('hidden.bs.modal', this.resetModalData);
     }
 
