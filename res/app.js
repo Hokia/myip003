@@ -1,8 +1,7 @@
 new Vue({
     el: '#app',
     data: {
-        // ✅ 方案二：Google Maps Embed API
-        // Place 模式免费无限制，需要设置 API Key
+        // ✅ Google Maps Embed API（Place 模式免费无限制）
         // 申请地址：https://console.cloud.google.com/apis/credentials
         // 启用 API：Maps Embed API
         googleMapAPIKEY: 'AIzaSyBp0Qkt1_XLzYZinO_A9fjwTOuKGrFWl6Y',
@@ -357,7 +356,6 @@ new Vue({
         // ✅ 生成地图URL的辅助方法 - Google Maps Embed API 版本
         generateMapUrl(latitude, longitude) {
             // Google Maps Embed API（Place模式免费无限制）
-            // 需要在顶部 data 中设置 googleMapAPIKEY
             if (this.googleMapAPIKEY) {
                 return `https://www.google.com/maps/embed/v1/place?key=${this.googleMapAPIKEY}&q=${latitude},${longitude}&zoom=10`;
             }
@@ -729,8 +727,10 @@ new Vue({
     },
 
     created() {
-        // ✅ 修复：OpenStreetMap 不需要 API Key，所以地图功能默认可用
-        if (localStorage.getItem('isMapShown')) {
+        // 如果没有设置 API Key，地图功能不可用
+        if (!this.googleMapAPIKEY || this.googleMapAPIKEY === 'YOUR_GOOGLE_MAPS_API_KEY_HERE') {
+            this.isMapShown = false;
+        } else if (localStorage.getItem('isMapShown')) {
             this.isMapShown = localStorage.getItem('isMapShown') === 'true';
         }
         this.isMobile = window.innerWidth < 768;
