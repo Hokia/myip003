@@ -364,36 +364,97 @@ new Vue({
             return `https://www.openstreetmap.org/export/embed.html?bbox=${longitude - delta},${latitude - delta},${longitude + delta},${latitude + delta}&layer=mapnik&marker=${latitude},${longitude}`;
         },
 
+        // ✅ 多 API 自动切换机制
         async fetchIPDetails(card, ip) {
-            try {
-                // ✅ 使用 ipwho.is（免费，10,000次/月，支持HTTPS，无需API Key）
-                const response = await fetch(`https://ipwho.is/${ip}`);
-                const data = await response.json();
-                if (!data.success) {
-                    throw new Error(data.message || 'IP lookup failed');
+            const apis = [
+                {
+                    name: 'ip.sb',
+                    url: `https://api.ip.sb/geoip/${ip}`,
+                    parse: (data) => ({
+                        country_name: data.country || '',
+                        country_code: data.country_code || '',
+                        region: data.region || '',
+                        city: data.city || '',
+                        latitude: data.latitude || '',
+                        longitude: data.longitude || '',
+                        isp: data.isp || data.organization || '',
+                        asn: data.asn ? `AS${data.asn}` : ''
+                    })
+                },
+                {
+                    name: 'ipwho.is',
+                    url: `https://ipwho.is/${ip}`,
+                    parse: (data) => {
+                        if (!data.success) throw new Error(data.message);
+                        return {
+                            country_name: data.country || '',
+                            country_code: data.country_code || '',
+                            region: data.region || '',
+                            city: data.city || '',
+                            latitude: data.latitude || '',
+                            longitude: data.longitude || '',
+                            isp: data.connection?.isp || data.connection?.org || '',
+                            asn: data.connection?.asn ? `AS${data.connection.asn}` : ''
+                        };
+                    }
+                },
+                {
+                    name: 'freeipapi',
+                    url: `https://freeipapi.com/api/json/${ip}`,
+                    parse: (data) => ({
+                        country_name: data.countryName || '',
+                        country_code: data.countryCode || '',
+                        region: data.regionName || '',
+                        city: data.cityName || '',
+                        latitude: data.latitude || '',
+                        longitude: data.longitude || '',
+                        isp: '',
+                        asn: ''
+                    })
                 }
-                card.ip = ip;
-                card.country_name = data.country || '';
-                card.country_code = data.country_code || '';
-                card.region = data.region || '';
-                card.city = data.city || '';
-                card.latitude = data.latitude || '';
-                card.longitude = data.longitude || '';
-                card.isp = data.connection?.isp || data.connection?.org || '';
-                card.asn = data.connection?.asn ? `AS${data.connection.asn}` : '';
+            ];
 
-                if (card.asn === '') {
-                    card.asnlink = false;
-                    card.mapUrl = '';
-                } else {
-                    card.asnlink = `https://radar.cloudflare.com/traffic/${card.asn}`;
-                    // ✅ 使用辅助方法生成地图URL
-                    card.mapUrl = this.generateMapUrl(card.latitude, card.longitude);
+            for (const api of apis) {
+                try {
+                    const response = await fetch(api.url);
+                    if (!response.ok) {
+                        console.warn(`${api.name} 返回 ${response.status}，尝试下一个API...`);
+                        continue;
+                    }
+                    const data = await response.json();
+                    const parsed = api.parse(data);
+                    
+                    card.ip = ip;
+                    card.country_name = parsed.country_name;
+                    card.country_code = parsed.country_code;
+                    card.region = parsed.region;
+                    card.city = parsed.city;
+                    card.latitude = parsed.latitude;
+                    card.longitude = parsed.longitude;
+                    card.isp = parsed.isp;
+                    card.asn = parsed.asn;
+
+                    if (card.asn === '' && card.latitude && card.longitude) {
+                        card.asnlink = false;
+                        card.mapUrl = this.generateMapUrl(card.latitude, card.longitude);
+                    } else if (card.asn) {
+                        card.asnlink = `https://radar.cloudflare.com/traffic/${card.asn}`;
+                        card.mapUrl = this.generateMapUrl(card.latitude, card.longitude);
+                    } else {
+                        card.asnlink = false;
+                        card.mapUrl = '';
+                    }
+                    
+                    console.log(`✅ ${api.name} 获取成功`);
+                    return; // 成功后退出
+                } catch (error) {
+                    console.warn(`${api.name} 失败: ${error.message}，尝试下一个API...`);
                 }
-            } catch (error) {
-                console.error('获取 IP 详情时出错:', error);
-                card.mapUrl = '';
             }
+            
+            // 所有API都失败
+            console.error('所有 IP 地理位置 API 都失败了');
+            card.mapUrl = '';
         },
 
         refreshCard(card) {
@@ -531,38 +592,89 @@ new Vue({
             return ipv4Pattern.test(ip) || ipv6Pattern.test(ip);
         },
 
+        // ✅ Modal查询也使用多API自动切换
         async fetchIPForModal(ip) {
-            try {
-                // ✅ 使用 ipwho.is（免费，10,000次/月，支持HTTPS，无需API Key）
-                const response = await fetch(`https://ipwho.is/${ip}`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+            const apis = [
+                {
+                    name: 'ip.sb',
+                    url: `https://api.ip.sb/geoip/${ip}`,
+                    parse: (data) => ({
+                        country_name: data.country || '',
+                        country_code: data.country_code || '',
+                        region: data.region || '',
+                        city: data.city || '',
+                        latitude: data.latitude || '',
+                        longitude: data.longitude || '',
+                        isp: data.isp || data.organization || '',
+                        asn: data.asn ? `AS${data.asn}` : ''
+                    })
+                },
+                {
+                    name: 'ipwho.is',
+                    url: `https://ipwho.is/${ip}`,
+                    parse: (data) => {
+                        if (!data.success) throw new Error(data.message);
+                        return {
+                            country_name: data.country || '',
+                            country_code: data.country_code || '',
+                            region: data.region || '',
+                            city: data.city || '',
+                            latitude: data.latitude || '',
+                            longitude: data.longitude || '',
+                            isp: data.connection?.isp || data.connection?.org || '',
+                            asn: data.connection?.asn ? `AS${data.connection.asn}` : ''
+                        };
+                    }
+                },
+                {
+                    name: 'freeipapi',
+                    url: `https://freeipapi.com/api/json/${ip}`,
+                    parse: (data) => ({
+                        country_name: data.countryName || '',
+                        country_code: data.countryCode || '',
+                        region: data.regionName || '',
+                        city: data.cityName || '',
+                        latitude: data.latitude || '',
+                        longitude: data.longitude || '',
+                        isp: '',
+                        asn: ''
+                    })
                 }
-                const data = await response.json();
-                if (!data.success) {
-                    throw new Error(data.message || 'IP lookup failed');
+            ];
+
+            for (const api of apis) {
+                try {
+                    const response = await fetch(api.url);
+                    if (!response.ok) {
+                        console.warn(`${api.name} 返回 ${response.status}，尝试下一个API...`);
+                        continue;
+                    }
+                    const data = await response.json();
+                    const parsed = api.parse(data);
+
+                    this.modalQueryResult = {
+                        ip,
+                        country_name: parsed.country_name,
+                        country_code: parsed.country_code,
+                        region: parsed.region,
+                        city: parsed.city,
+                        latitude: parsed.latitude,
+                        longitude: parsed.longitude,
+                        isp: parsed.isp,
+                        asn: parsed.asn,
+                        asnlink: parsed.asn ? `https://radar.cloudflare.com/traffic/${parsed.asn}` : false,
+                        mapUrl: parsed.latitude && parsed.longitude ? this.generateMapUrl(parsed.latitude, parsed.longitude) : ''
+                    };
+                    
+                    console.log(`✅ ${api.name} 获取成功`);
+                    return; // 成功后退出
+                } catch (error) {
+                    console.warn(`${api.name} 失败: ${error.message}，尝试下一个API...`);
                 }
-
-                const asn = data.connection?.asn ? `AS${data.connection.asn}` : '';
-
-                this.modalQueryResult = {
-                    ip,
-                    country_name: data.country || '',
-                    country_code: data.country_code || '',
-                    region: data.region || '',
-                    city: data.city || '',
-                    latitude: data.latitude || '',
-                    longitude: data.longitude || '',
-                    isp: data.connection?.isp || data.connection?.org || '',
-                    asn: asn,
-                    asnlink: asn ? `https://radar.cloudflare.com/traffic/${asn}` : false,
-                    // ✅ 使用辅助方法生成地图URL
-                    mapUrl: data.latitude && data.longitude ? this.generateMapUrl(data.latitude, data.longitude) : ''
-                };
-            } catch (error) {
-                console.error('获取 IP 详情时出错:', error);
-                this.modalQueryError = error.message;
             }
+            
+            // 所有API都失败
+            this.modalQueryError = '所有 IP 查询服务暂时不可用，请稍后再试';
         },
 
         resetModalData() {
