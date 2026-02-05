@@ -366,20 +366,21 @@ new Vue({
 
         async fetchIPDetails(card, ip) {
             try {
-                const response = await fetch(`https://ipapi.co/${ip}/json/`);
+                // ✅ 使用 ipwho.is（免费，10,000次/月，支持HTTPS，无需API Key）
+                const response = await fetch(`https://ipwho.is/${ip}`);
                 const data = await response.json();
-                if (data.error) {
-                    throw new Error(data.reason);
+                if (!data.success) {
+                    throw new Error(data.message || 'IP lookup failed');
                 }
                 card.ip = ip;
-                card.country_name = data.country_name || '';
-                card.country_code = data.country || '';
+                card.country_name = data.country || '';
+                card.country_code = data.country_code || '';
                 card.region = data.region || '';
                 card.city = data.city || '';
                 card.latitude = data.latitude || '';
                 card.longitude = data.longitude || '';
-                card.isp = data.org || '';
-                card.asn = data.asn || '';
+                card.isp = data.connection?.isp || data.connection?.org || '';
+                card.asn = data.connection?.asn ? `AS${data.connection.asn}` : '';
 
                 if (card.asn === '') {
                     card.asnlink = false;
@@ -532,26 +533,29 @@ new Vue({
 
         async fetchIPForModal(ip) {
             try {
-                const response = await fetch(`https://ipapi.co/${ip}/json/`);
+                // ✅ 使用 ipwho.is（免费，10,000次/月，支持HTTPS，无需API Key）
+                const response = await fetch(`https://ipwho.is/${ip}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
-                if (data.error) {
-                    throw new Error(data.reason);
+                if (!data.success) {
+                    throw new Error(data.message || 'IP lookup failed');
                 }
+
+                const asn = data.connection?.asn ? `AS${data.connection.asn}` : '';
 
                 this.modalQueryResult = {
                     ip,
-                    country_name: data.country_name || '',
+                    country_name: data.country || '',
                     country_code: data.country_code || '',
                     region: data.region || '',
                     city: data.city || '',
                     latitude: data.latitude || '',
                     longitude: data.longitude || '',
-                    isp: data.org || '',
-                    asn: data.asn || '',
-                    asnlink: data.asn ? `https://radar.cloudflare.com/traffic/${data.asn}` : false,
+                    isp: data.connection?.isp || data.connection?.org || '',
+                    asn: asn,
+                    asnlink: asn ? `https://radar.cloudflare.com/traffic/${asn}` : false,
                     // ✅ 使用辅助方法生成地图URL
                     mapUrl: data.latitude && data.longitude ? this.generateMapUrl(data.latitude, data.longitude) : ''
                 };
