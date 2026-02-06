@@ -213,6 +213,7 @@ new Vue({
                 mapUrl: 'res/defaultMap.jpg',
                 showMap: false,
                 sunInfo: null,
+                region_code: '',
                 source: 'Upai'
             },
             {
@@ -230,6 +231,7 @@ new Vue({
                 mapUrl: 'res/defaultMap.jpg',
                 showMap: false,
                 sunInfo: null,
+                region_code: '',
                 source: 'Sohu'
             },
             {
@@ -247,6 +249,7 @@ new Vue({
                 mapUrl: 'res/defaultMap.jpg',
                 showMap: false,
                 sunInfo: null,
+                region_code: '',
                 source: 'Cloudflare IPv4'
             },
             {
@@ -264,6 +267,7 @@ new Vue({
                 mapUrl: 'res/defaultMap.jpg',
                 showMap: false,
                 sunInfo: null,
+                region_code: '',
                 source: 'Cloudflare IPv6'
             },
             {
@@ -281,6 +285,7 @@ new Vue({
                 mapUrl: 'res/defaultMap.jpg',
                 showMap: false,
                 sunInfo: null,
+                region_code: '',
                 source: 'IPify IPv4（OpenAI）'
             },
             {
@@ -298,6 +303,7 @@ new Vue({
                 mapUrl: 'res/defaultMap.jpg',
                 showMap: false,
                 sunInfo: null,
+                region_code: '',
                 source: 'IPify IPv6（OpenAI）'
             },
         ],
@@ -601,6 +607,42 @@ new Vue({
             return params;
         },
 
+        // ✅ 港澳台归一化：将 Hong Kong / Macao / Taiwan 归入 China，原值移至 region
+        normalizeChineseRegion: function(card) {
+            var map = {
+                'Hong Kong':  { code: 'hk', name: 'Hong Kong' },
+                'Macao':      { code: 'mo', name: 'Macao' },
+                'Macau':      { code: 'mo', name: 'Macau' },
+                'Taiwan':     { code: 'tw', name: 'Taiwan' }
+            };
+
+            // 按 country_name 匹配
+            var match = null;
+            var keys = Object.keys(map);
+            for (var i = 0; i < keys.length; i++) {
+                if (card.country_name && card.country_name.toLowerCase() === keys[i].toLowerCase()) {
+                    match = map[keys[i]];
+                    break;
+                }
+            }
+            // 也按 country_code 兜底匹配
+            if (!match && card.country_code) {
+                var cc = card.country_code.toUpperCase();
+                if (cc === 'HK') match = map['Hong Kong'];
+                else if (cc === 'MO') match = map['Macao'];
+                else if (cc === 'TW') match = map['Taiwan'];
+            }
+
+            if (match) {
+                // 把原始地区名写入 region，附带地区旗帜代码
+                card.region = match.name + (card.region ? ' - ' + card.region : '');
+                card.region_code = match.code;
+                // 国家改为 China
+                card.country_name = 'China';
+                card.country_code = 'CN';
+            }
+        },
+
         // ✅ 判断指定经纬度当前是否为白天，并返回日出日落信息
         getSunInfoForLocation: function(latitude, longitude) {
             if (typeof SunCalc === 'undefined') {
@@ -689,6 +731,9 @@ new Vue({
                     } else {
                         card.asnlink = false;
                     }
+
+                    // ✅ 港澳台归一化处理
+                    self.normalizeChineseRegion(card);
                     
                     // ✅ 生成地图 URL（内部自动判断日夜样式）
                     if (card.latitude && card.longitude) {
@@ -740,6 +785,9 @@ new Vue({
                     } else {
                         card.asnlink = false;
                     }
+
+                    // ✅ 港澳台归一化处理
+                    self.normalizeChineseRegion(card);
                     
                     // ✅ 生成地图 URL（内部自动判断日夜样式）
                     if (card.latitude && card.longitude) {
@@ -799,6 +847,7 @@ new Vue({
             card.isp = '';
             card.mapUrl = 'res/defaultMap.jpg';
             card.sunInfo = null;
+            card.region_code = '';
         },
 
         toggleMaps: function() {
@@ -919,6 +968,7 @@ new Vue({
                         country_name: data.country || '',
                         country_code: data.country_code || '',
                         region: data.region || '',
+                        region_code: '',
                         city: data.city || '',
                         latitude: data.latitude || '',
                         longitude: data.longitude || '',
@@ -927,6 +977,7 @@ new Vue({
                         asnlink: data.asn ? 'https://radar.cloudflare.com/traffic/AS' + data.asn : false,
                         mapUrl: (data.latitude && data.longitude) ? self.generateMapUrl(data.latitude, data.longitude) : ''
                     };
+                    self.normalizeChineseRegion(self.modalQueryResult);
                     console.log('✅ Modal查询成功');
                 })
                 .catch(function(error) {
@@ -957,6 +1008,7 @@ new Vue({
                         country_name: data.country || '',
                         country_code: data.country_code || '',
                         region: data.region || '',
+                        region_code: '',
                         city: data.city || '',
                         latitude: data.latitude || '',
                         longitude: data.longitude || '',
@@ -965,6 +1017,7 @@ new Vue({
                         asnlink: asn ? 'https://radar.cloudflare.com/traffic/AS' + asn : false,
                         mapUrl: (data.latitude && data.longitude) ? self.generateMapUrl(data.latitude, data.longitude) : ''
                     };
+                    self.normalizeChineseRegion(self.modalQueryResult);
                 })
                 .catch(function(error) {
                     self.modalQueryError = '所有 IP 查询服务暂时不可用，请稍后再试';
