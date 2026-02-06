@@ -268,7 +268,7 @@ new Vue({
                 showMap: false,
                 sunInfo: null,
                 region_code: '',
-                source: 'Cloudflare IPv6'
+                source: 'IP.sb IPv6'
             },
             {
                 id: 'ipify_v4',
@@ -513,19 +513,22 @@ new Vue({
 
         getIPFromCloudflare_V6: function() {
             var self = this;
-            fetch('https://[2606:4700:4700::1111]/cdn-cgi/trace')
-                .then(function(response) { return response.text(); })
+            fetch('https://api-ipv6.ip.sb/ip')
+                .then(function(response) {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
                 .then(function(data) {
-                    var lines = data.split('\n');
-                    var ipLine = lines.find(function(line) { return line.startsWith('ip='); });
-                    if (ipLine) {
-                        var ip = ipLine.split('=')[1];
+                    var ip = data.trim();
+                    if (ip) {
                         self.ipDataCards[3].ip = ip;
                         self.fetchIPDetails(self.ipDataCards[3], ip);
                     }
                 })
                 .catch(function(error) {
-                    console.error('Error fetching IP from Cloudflare:', error);
+                    console.error('Error fetching IPv6 from ip.sb:', error);
                     self.ipDataCards[3].ip = '获取失败或不存在 IPv6 地址';
                 });
         },
@@ -668,7 +671,7 @@ new Vue({
                 return 'res/defaultMap.jpg';
             }
             
-            var zoom = 3;
+            var zoom = 10;
             var width = 400;
             var height = 240;
             
@@ -815,7 +818,7 @@ new Vue({
                 case 'Cloudflare IPv4':
                     this.getIPFromCloudflare_V4();
                     break;
-                case 'Cloudflare IPv6':
+                case 'IP.sb IPv6':
                     this.getIPFromCloudflare_V6();
                     break;
                 case 'IPify IPv4（OpenAI）':
