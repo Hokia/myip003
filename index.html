@@ -49,7 +49,6 @@
 
 
 
-
     <!-- 翻墙状态通知 -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3 jn-toast">
       <div id="toast" class="toast" :class="{ 'dark-mode': isDarkMode }" role="alert" ref="toast" aria-live="assertive"
@@ -142,6 +141,12 @@
                           card.asn }}</a><span v-else>{{
                           card.asn
                           }}</span></li>
+                      <!-- ✅ 新增：显示日出日落时间和昼夜状态 -->
+                      <li v-show="isMapShown && card.sunInfo && (!isMobile || !isCardsCollapsed)" class="list-group-item jn-list-group-item"
+                        :class="{ 'dark-mode': isDarkMode }"><span
+                          class="jn-text">{{ card.sunInfo && card.sunInfo.isDaytime ? '☀️ 白天' : '🌙 黑夜' }}</span>:
+                        <span v-if="card.sunInfo">日出 {{ card.sunInfo.sunrise }} / 日落 {{ card.sunInfo.sunset }}</span>
+                      </li>
                     </ul>
                   </div>
 
@@ -161,7 +166,7 @@
                 class="bi bi-arrow-clockwise"></i></button>
           </div>
           <div class="text-secondary">
-            <p>通过加载对应网站上的小图片进行测试，延迟值仅供参考，实际会更小。</p>
+            <p>检测你的网络是否可以通过各个网站进行访问。</p>
           </div>
           <div class="row">
             <div v-for="test in connectivityTests" :key="test.id" class="col-6 col-md-3 mb-4">
@@ -318,6 +323,8 @@
 
   <!-- 引入 Vue.js -->
   <script src="res/vue.js"></script>
+  <!-- ✅ 引入日出日落计算模块 -->
+  <script src="res/sunCalc.js"></script>
   <script src="res/app.js"></script>
 
 
