@@ -628,7 +628,7 @@ new Vue({
             
             var zoom = 10;
             var width = 400;
-            var height = 200;
+            var height = 240;
             
             // 使用 Google Static Maps API
             if (this.googleMapAPIKEY) {
