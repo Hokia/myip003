@@ -668,7 +668,7 @@ new Vue({
                 return 'res/defaultMap.jpg';
             }
             
-            var zoom = 5;
+            var zoom = 3;
             var width = 400;
             var height = 240;
             
