@@ -137,7 +137,8 @@
                       </li>
                       <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
                         :class="{ 'dark-mode': isDarkMode }"><span class="jn-text">🏚️ 地区</span>: {{ card.region
-                        }}</li>
+                        }}&nbsp;<span v-if="card.region_code"
+                          :class="'flag-icon flag-icon-' + card.region_code"></span></li>
                       <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
                         :class="{ 'dark-mode': isDarkMode }"><span class="jn-text">🚏 城市</span>: {{ card.city }}
                       </li>
@@ -288,7 +289,8 @@
                   <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
                       class="jn-text">🏚️ 地区</span>: {{
                     modalQueryResult.region
-                    }}</li>
+                    }}&nbsp;<span v-if="modalQueryResult.region_code"
+                      :class="'flag-icon flag-icon-' + modalQueryResult.region_code"></span></li>
                   <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
                       class="jn-text">🚏 城市</span>: {{
                     modalQueryResult.city }}
