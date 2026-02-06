@@ -6,6 +6,197 @@ new Vue({
         googleMapAPIKEY: 'AIzaSyBp0Qkt1_XLzYZinO_A9fjwTOuKGrFWl6Y',
         bingMapAPIKEY: 'AIzaSyBp0Qkt1_XLzYZinO_A9fjwTOuKGrFWl6Y',  // 兼容旧模板
         
+        // ✅ 白天地图样式 - 简洁明亮（仅隐藏不需要的元素）
+        dayMapStyle: [
+            {
+                "featureType": "administrative.land_parcel",
+                "elementType": "labels",
+                "stylers": [{ "visibility": "off" }]
+            },
+            {
+                "featureType": "poi",
+                "elementType": "labels.text",
+                "stylers": [{ "visibility": "off" }]
+            },
+            {
+                "featureType": "poi.business",
+                "stylers": [{ "visibility": "off" }]
+            },
+            {
+                "featureType": "road",
+                "elementType": "labels.icon",
+                "stylers": [{ "visibility": "off" }]
+            },
+            {
+                "featureType": "road.local",
+                "elementType": "labels",
+                "stylers": [{ "visibility": "off" }]
+            },
+            {
+                "featureType": "transit",
+                "stylers": [{ "visibility": "off" }]
+            }
+        ],
+
+        // ✅ 黑夜地图样式 - 深色主题
+        nightMapStyle: [
+            {
+                "elementType": "geometry",
+                "stylers": [{ "color": "#1d2c4d" }]
+            },
+            {
+                "elementType": "labels.text.fill",
+                "stylers": [{ "color": "#8ec3b9" }]
+            },
+            {
+                "elementType": "labels.text.stroke",
+                "stylers": [{ "color": "#1a3646" }]
+            },
+            {
+                "featureType": "administrative.country",
+                "elementType": "geometry.stroke",
+                "stylers": [{ "color": "#4b6878" }]
+            },
+            {
+                "featureType": "administrative.land_parcel",
+                "elementType": "labels",
+                "stylers": [{ "visibility": "off" }]
+            },
+            {
+                "featureType": "administrative.land_parcel",
+                "elementType": "labels.text.fill",
+                "stylers": [{ "color": "#64779e" }]
+            },
+            {
+                "featureType": "administrative.province",
+                "elementType": "geometry.stroke",
+                "stylers": [{ "color": "#4b6878" }]
+            },
+            {
+                "featureType": "landscape.man_made",
+                "elementType": "geometry.stroke",
+                "stylers": [{ "color": "#334e87" }]
+            },
+            {
+                "featureType": "landscape.natural",
+                "elementType": "geometry",
+                "stylers": [{ "color": "#023e58" }]
+            },
+            {
+                "featureType": "poi",
+                "elementType": "geometry",
+                "stylers": [{ "color": "#283d6a" }]
+            },
+            {
+                "featureType": "poi",
+                "elementType": "labels.text",
+                "stylers": [{ "visibility": "off" }]
+            },
+            {
+                "featureType": "poi",
+                "elementType": "labels.text.fill",
+                "stylers": [{ "color": "#6f9ba5" }]
+            },
+            {
+                "featureType": "poi",
+                "elementType": "labels.text.stroke",
+                "stylers": [{ "color": "#1d2c4d" }]
+            },
+            {
+                "featureType": "poi.business",
+                "stylers": [{ "visibility": "off" }]
+            },
+            {
+                "featureType": "poi.park",
+                "elementType": "geometry.fill",
+                "stylers": [{ "color": "#023e58" }]
+            },
+            {
+                "featureType": "poi.park",
+                "elementType": "labels.text.fill",
+                "stylers": [{ "color": "#3C7680" }]
+            },
+            {
+                "featureType": "road",
+                "elementType": "geometry",
+                "stylers": [{ "color": "#304a7d" }]
+            },
+            {
+                "featureType": "road",
+                "elementType": "labels.icon",
+                "stylers": [{ "visibility": "off" }]
+            },
+            {
+                "featureType": "road",
+                "elementType": "labels.text.fill",
+                "stylers": [{ "color": "#98a5be" }]
+            },
+            {
+                "featureType": "road",
+                "elementType": "labels.text.stroke",
+                "stylers": [{ "color": "#1d2c4d" }]
+            },
+            {
+                "featureType": "road.highway",
+                "elementType": "geometry",
+                "stylers": [{ "color": "#2c6675" }]
+            },
+            {
+                "featureType": "road.highway",
+                "elementType": "geometry.stroke",
+                "stylers": [{ "color": "#255763" }]
+            },
+            {
+                "featureType": "road.highway",
+                "elementType": "labels.text.fill",
+                "stylers": [{ "color": "#b0d5ce" }]
+            },
+            {
+                "featureType": "road.highway",
+                "elementType": "labels.text.stroke",
+                "stylers": [{ "color": "#023e58" }]
+            },
+            {
+                "featureType": "road.local",
+                "elementType": "labels",
+                "stylers": [{ "visibility": "off" }]
+            },
+            {
+                "featureType": "transit",
+                "stylers": [{ "visibility": "off" }]
+            },
+            {
+                "featureType": "transit",
+                "elementType": "labels.text.fill",
+                "stylers": [{ "color": "#98a5be" }]
+            },
+            {
+                "featureType": "transit",
+                "elementType": "labels.text.stroke",
+                "stylers": [{ "color": "#1d2c4d" }]
+            },
+            {
+                "featureType": "transit.line",
+                "elementType": "geometry.fill",
+                "stylers": [{ "color": "#283d6a" }]
+            },
+            {
+                "featureType": "transit.station",
+                "elementType": "geometry",
+                "stylers": [{ "color": "#3a4762" }]
+            },
+            {
+                "featureType": "water",
+                "elementType": "geometry",
+                "stylers": [{ "color": "#0e1626" }]
+            },
+            {
+                "featureType": "water",
+                "elementType": "labels.text.fill",
+                "stylers": [{ "color": "#4e6d70" }]
+            }
+        ],
+
         ipDataCards: [
             {
                 id: 'upai',
@@ -21,6 +212,7 @@ new Vue({
                 asnlink: '',
                 mapUrl: 'res/defaultMap.jpg',
                 showMap: false,
+                sunInfo: null,
                 source: 'Upai'
             },
             {
@@ -37,6 +229,7 @@ new Vue({
                 asnlink: '',
                 mapUrl: 'res/defaultMap.jpg',
                 showMap: false,
+                sunInfo: null,
                 source: 'Sohu'
             },
             {
@@ -53,6 +246,7 @@ new Vue({
                 asnlink: '',
                 mapUrl: 'res/defaultMap.jpg',
                 showMap: false,
+                sunInfo: null,
                 source: 'Cloudflare IPv4'
             },
             {
@@ -69,6 +263,7 @@ new Vue({
                 asnlink: '',
                 mapUrl: 'res/defaultMap.jpg',
                 showMap: false,
+                sunInfo: null,
                 source: 'Cloudflare IPv6'
             },
             {
@@ -85,6 +280,7 @@ new Vue({
                 asnlink: '',
                 mapUrl: 'res/defaultMap.jpg',
                 showMap: false,
+                sunInfo: null,
                 source: 'IPify IPv4（OpenAI）'
             },
             {
@@ -101,6 +297,7 @@ new Vue({
                 asnlink: '',
                 mapUrl: 'res/defaultMap.jpg',
                 showMap: false,
+                sunInfo: null,
                 source: 'IPify IPv6（OpenAI）'
             },
         ],
@@ -365,7 +562,65 @@ new Vue({
                 });
         },
 
-        // ✅ 生成 Google Static Maps API URL
+        // ✅ 将 JSON 样式数组转换为 Google Static Maps API 的 style 参数字符串
+        convertStylesToStaticParams: function(stylesArray) {
+            var params = '';
+            for (var i = 0; i < stylesArray.length; i++) {
+                var rule = stylesArray[i];
+                var parts = [];
+
+                // feature
+                if (rule.featureType) {
+                    parts.push('feature:' + rule.featureType);
+                }
+                // element
+                if (rule.elementType) {
+                    parts.push('element:' + rule.elementType);
+                }
+                // stylers
+                if (rule.stylers) {
+                    for (var j = 0; j < rule.stylers.length; j++) {
+                        var styler = rule.stylers[j];
+                        var keys = Object.keys(styler);
+                        for (var k = 0; k < keys.length; k++) {
+                            var key = keys[k];
+                            var value = styler[key];
+                            // 颜色值：将 #RRGGBB 转换为 0xRRGGBB
+                            if (key === 'color' && typeof value === 'string' && value.charAt(0) === '#') {
+                                value = '0x' + value.substring(1);
+                            }
+                            parts.push(key + ':' + value);
+                        }
+                    }
+                }
+
+                if (parts.length > 0) {
+                    params += '&style=' + encodeURIComponent(parts.join('|'));
+                }
+            }
+            return params;
+        },
+
+        // ✅ 判断指定经纬度当前是否为白天，并返回日出日落信息
+        getSunInfoForLocation: function(latitude, longitude) {
+            if (typeof SunCalc === 'undefined') {
+                console.warn('SunCalc 模块未加载，使用默认白天样式');
+                return { isDaytime: true, sunrise: '--:--', sunset: '--:--' };
+            }
+
+            var times = SunCalc.getTimes(new Date(), latitude, longitude);
+            var timezoneOffset = Math.round(longitude / 15);
+
+            return {
+                isDaytime: times.isDaytime,
+                isPolarNight: times.isPolarNight || false,
+                isPolarDay: times.isPolarDay || false,
+                sunrise: SunCalc.formatTime(times.sunrise, timezoneOffset),
+                sunset: SunCalc.formatTime(times.sunset, timezoneOffset)
+            };
+        },
+
+        // ✅ 生成 Google Static Maps API URL（带日夜样式）
         generateMapUrl: function(latitude, longitude) {
             if (!latitude || !longitude) {
                 return 'res/defaultMap.jpg';
@@ -377,10 +632,30 @@ new Vue({
             
             // 使用 Google Static Maps API
             if (this.googleMapAPIKEY) {
-                return 'https://maps.googleapis.com/maps/api/staticmap?center=' + latitude + ',' + longitude + '&zoom=' + zoom + '&size=' + width + 'x' + height + '&markers=color:red%7C' + latitude + ',' + longitude + '&key=' + this.googleMapAPIKEY;
+                var baseUrl = 'https://maps.googleapis.com/maps/api/staticmap?center=' + latitude + ',' + longitude
+                    + '&zoom=' + zoom
+                    + '&size=' + width + 'x' + height
+                    + '&markers=color:red%7C' + latitude + ',' + longitude
+                    + '&key=' + this.googleMapAPIKEY;
+
+                // ✅ 根据 IP 所在地的日出日落判断白天黑夜，应用对应地图样式
+                var sunInfo = this.getSunInfoForLocation(latitude, longitude);
+                var styleArray = sunInfo.isDaytime ? this.dayMapStyle : this.nightMapStyle;
+                var styleParams = this.convertStylesToStaticParams(styleArray);
+
+                // 黑夜模式下使用白色标记以增强对比度
+                if (!sunInfo.isDaytime) {
+                    baseUrl = baseUrl.replace('markers=color:red', 'markers=color:0xFFCC00');
+                }
+
+                console.log('🗺️ 地图样式: ' + (sunInfo.isDaytime ? '☀️ 白天' : '🌙 黑夜') 
+                    + ' | 日出: ' + sunInfo.sunrise + ' | 日落: ' + sunInfo.sunset
+                    + ' | 坐标: (' + latitude + ', ' + longitude + ')');
+
+                return baseUrl + styleParams;
             }
             
-            // 备用：OpenStreetMap 静态地图
+            // 备用：OpenStreetMap 静态地图（不支持自定义样式）
             return 'https://staticmap.openstreetmap.de/staticmap.php?center=' + latitude + ',' + longitude + '&zoom=' + zoom + '&size=' + width + 'x' + height + '&markers=' + latitude + ',' + longitude + ',red-pushpin';
         },
 
@@ -415,11 +690,14 @@ new Vue({
                         card.asnlink = false;
                     }
                     
-                    // 生成地图 URL
+                    // ✅ 生成地图 URL（内部自动判断日夜样式）
                     if (card.latitude && card.longitude) {
                         card.mapUrl = self.generateMapUrl(card.latitude, card.longitude);
+                        // ✅ 保存日出日落信息用于 UI 显示
+                        card.sunInfo = self.getSunInfoForLocation(card.latitude, card.longitude);
                     } else {
                         card.mapUrl = 'res/defaultMap.jpg';
+                        card.sunInfo = null;
                     }
                     
                     console.log('✅ ip.sb 获取成功:', data);
@@ -463,10 +741,14 @@ new Vue({
                         card.asnlink = false;
                     }
                     
+                    // ✅ 生成地图 URL（内部自动判断日夜样式）
                     if (card.latitude && card.longitude) {
                         card.mapUrl = self.generateMapUrl(card.latitude, card.longitude);
+                        // ✅ 保存日出日落信息用于 UI 显示
+                        card.sunInfo = self.getSunInfoForLocation(card.latitude, card.longitude);
                     } else {
                         card.mapUrl = 'res/defaultMap.jpg';
+                        card.sunInfo = null;
                     }
                     
                     console.log('✅ ipwho.is 获取成功');
@@ -474,6 +756,7 @@ new Vue({
                 .catch(function(error) {
                     console.error('所有 IP API 都失败了:', error);
                     card.mapUrl = 'res/defaultMap.jpg';
+                    card.sunInfo = null;
                 });
         },
 
@@ -515,6 +798,7 @@ new Vue({
             card.asn = '';
             card.isp = '';
             card.mapUrl = 'res/defaultMap.jpg';
+            card.sunInfo = null;
         },
 
         toggleMaps: function() {
