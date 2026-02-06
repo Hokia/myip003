@@ -117,7 +117,7 @@
                   </div>
 
                   <!-- ✅ 修复：使用v-show代替第二个v-if，并确保地图正确显示 -->
-                  <img v-if="isMapShown && !isMobile && card.mapUrl" 
+                  <img v-if="isMapShown && card.mapUrl" 
                        :src="card.mapUrl" 
                        class="card-img-top jn-map-image" 
                        alt="地图"
