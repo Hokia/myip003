@@ -638,7 +638,7 @@ new Vue({
 
             if (match) {
                 // 把原始地区名写入 region，附带地区旗帜代码
-                card.region = match.name + (card.region ? ' - ' + card.region : '');
+                card.region = match.name;
                 card.region_code = match.code;
                 // 国家改为 China
                 card.country_name = 'China';
