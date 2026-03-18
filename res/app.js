@@ -513,7 +513,7 @@ new Vue({
 
         getIPFromCloudflare_V6: function() {
             var self = this;
-            fetch('https://api-ipv6.ip.sb/ip')
+            fetch('https://[2606:4700:4700::1111]/cdn-cgi/trace')
                 .then(function(response) {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
@@ -528,7 +528,7 @@ new Vue({
                     }
                 })
                 .catch(function(error) {
-                    console.error('Error fetching IPv6 from ip.sb:', error);
+                    console.error('Error fetching IPv6 from cloudflare:', error);
                     self.ipDataCards[3].ip = '获取失败或不存在 IPv6 地址';
                 });
         },
