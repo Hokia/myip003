@@ -521,8 +521,9 @@ new Vue({
                     return response.text();
                 })
                 .then(function(data) {
-                    var ip = data.trim();
-                    if (ip) {
+                    var match = data.match(/^ip=(.+)$/m);
+                    if (match) {
+                        var ip = match[1].trim();
                         self.ipDataCards[3].ip = ip;
                         self.fetchIPDetails(self.ipDataCards[3], ip);
                     }
