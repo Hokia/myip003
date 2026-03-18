@@ -494,7 +494,7 @@ new Vue({
 
         getIPFromCloudflare_V4: function() {
             var self = this;
-            fetch('https://1.0.0.1/cdn-cgi/trace')
+            fetch('https://workers.dev/cdn-cgi/trace')
                 .then(function(response) { return response.text(); })
                 .then(function(data) {
                     var lines = data.split('\n');
