@@ -533,7 +533,27 @@ new Vue({
                     self.ipDataCards[3].ip = '获取失败或不存在 IPv6 地址';
                 });
         },
-
+        getIPFromIPSB_V4: function() {
+            var self = this;
+            fetch('https://api-ipv4.ip.sb/ip')
+                .then(function(response) {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
+                .then(function(data) {
+                    var ip = data.trim();
+                    if (ip) {
+                        self.ipDataCards[3].ip = ip;
+                        self.fetchIPDetails(self.ipDataCards[3], ip);
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error fetching IP from ip.sb:', error);
+                    self.ipDataCards[3].ip = '获取失败或不存在 IPv6 地址';
+                });
+        },
         getIPFromIpify_V4: function() {
             var self = this;
             fetch('https://api4.ipify.org?format=json')
@@ -820,7 +840,7 @@ new Vue({
                     this.getIPFromCloudflare_V4();
                     break;
                 case 'IP.sb AI':
-                    this.getIPFromCloudflare_V6();
+                    this.getIPFromIPSB_V4();
                     break;
                 case 'IPify IPv4（OpenAI）':
                     this.getIPFromIpify_V4();
@@ -867,6 +887,7 @@ new Vue({
             setTimeout(function() {
                 self.getIPFromCloudflare_V4();
                 self.getIPFromCloudflare_V6();
+                self.getIPFromIPSB_V4();
             }, 1000);
             setTimeout(function() {
                 self.getIPFromSohu();
