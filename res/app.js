@@ -268,7 +268,7 @@ new Vue({
                 showMap: false,
                 sunInfo: null,
                 region_code: '',
-                source: 'IP.sb IPv6'
+                source: 'IP.sb AI'
             },
             {
                 id: 'ipify_v4',
@@ -819,7 +819,7 @@ new Vue({
                 case 'Cloudflare IPv4':
                     this.getIPFromCloudflare_V4();
                     break;
-                case 'IP.sb IPv6':
+                case 'IP.sb AI':
                     this.getIPFromCloudflare_V6();
                     break;
                 case 'IPify IPv4（OpenAI）':
